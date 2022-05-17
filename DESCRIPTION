@@ -1,0 +1,22 @@
+Package: CellSpace
+Title: Downstream Analyses for CellSpace
+Description: A toolkit to analyze single-cell ATAC-seq data based on a learned CellSpace embedding
+Version: 0.0.1
+Authors@R:c(
+    person("Zakieh", "Tayyebi", email = "zakieh.tayyebi@gmail.com", role = c("aut", "cre"),
+           comment = c(ORCID = "https://orcid.org/0000-0002-7821-9905")),
+    person("The Christina Leslie Lab", role = "fnd",
+           comment = c(ORCID = "https://orcid.org/0000-0002-4571-5910")),
+    person("The Tri-Institutional PhD Program in Computational Biology & Medicine", role = "fnd"))
+URL: https://github.com/zakieh-tayyebi/CellSpace
+BugReports: https://github.com/zakieh-tayyebi/CellSpace/issues
+Imports:
+    Seurat,
+    Biostrings
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.0
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
