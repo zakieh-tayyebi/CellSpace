@@ -320,6 +320,8 @@ DNA_sequence_embedding <- function(object, seq){
 #'
 #' Map a motif to the embedding space.
 #'
+#' @importFrom Biostrings as.matrix
+#'
 #' @param object a \code{CellSpace} object
 #' @param PWM position weight matrix or position frequency matrix
 #'
