@@ -14,7 +14,7 @@ cso <- CellSpace(
 )
 cso <- find_neighbors(cso, n.neighbors = 40) # NN and SNN graphs for cells
 cso <- find_clusters(cso, resolution = c(1, 1.5, 2)) # cell clusters
-write.csv(cso@meta.data, "CellSpace-results/cell-clusters.csv")
+write.csv(cso@meta.data, "CellSpace-results/cell-metadata.csv")
 
 cso <- run_UMAP(cso, n.neighbors = 40, min.dist = 0.1, spread = 1) # cell UMAP
 write.csv(cso@reductions$cells_UMAP, file = "CellSpace-results/UMAP-cells.csv")
