@@ -12,4 +12,5 @@ The selected tiles and their corresponding cell-by-tile counts matrix [were extr
 
 A CellSpace model was trained with “--k 8 --sampleLen 150 --dim 30 --ngrams 3 --exmpPerPeak 20 --epoch 20” on the cell-by-tile count matrix and genomic sequences extracted from the corresponding tiles. The resulting CellSpace embedding for cells and k-mers (k = 8) was used for downstream analyses.
 
-### [CellSpace visualization, clustering, and motif embeddings](CellSpace-downstream.R)
+## [CellSpace visualization, clustering, and motif embeddings.](CellSpace-downstream.R)
+
