@@ -13,7 +13,8 @@ cso <- CellSpace(
   cell.names = rownames(cell.md)
 )
 cso <- find_neighbors(cso, n.neighbors = 40) # NN and SNN graphs for cells
-cso <- find_clusters(cso, resolution = 1.5) # cell clusters
+cso <- find_clusters(cso, resolution = c(1, 1.5, 2)) # cell clusters
+write.csv(cso@meta.data, "CellSpace-results/cell-clusters.csv")
 
 cso <- run_UMAP(cso, n.neighbors = 40, min.dist = 0.1, spread = 1) # cell UMAP
 write.csv(cso@reductions$cells_UMAP, file = "CellSpace-results/UMAP-cells.csv")
@@ -41,4 +42,3 @@ write.csv(cso@reductions$cells_and_TFs_UMAP, file = "CellSpace-results/UMAP-cell
 TF.score <- cosine_similarity(x = cso@cell.emb, y = hg.motif.emb[mi, ]) %>% # cell-TF similarity
   scale() %>% t() # z-score
 write.csv(TF.score, file = "CellSpace-results/TF-activity-scores.csv")
-
