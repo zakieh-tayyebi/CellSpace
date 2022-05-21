@@ -2,7 +2,7 @@
 
 This code is an extension of [StarSpace](https://github.com/facebookresearch/StarSpace) (see [MIT license](StarSpace-MIT-License.md)) and incorporates the CellSpace algorithm for scATAC-seq data.
 
-See [the methods](https://www.biorxiv.org/content/early/2022/05/02/2022.05.02.490310.full.pdf) for more details about the algorithm.
+See [the methods](https://www.biorxiv.org/content/early/2022/05/20/2022.05.02.490310.full.pdf) for more details about the algorithm.
 
 ## Building CellSpace
 

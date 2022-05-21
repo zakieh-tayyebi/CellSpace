@@ -2,7 +2,7 @@
 
 This package provides tools to use and interpret a CellSpace embedding, trained with the [C++ code](../cpp/) on single-cell ATAC-seq data, in order to cluster and visualize cells, compute transcription factor activity scores, etc.
 
-See [the methods](https://www.biorxiv.org/content/early/2022/05/02/2022.05.02.490310.full.pdf) for more details about the algorithm.
+See [the methods](https://www.biorxiv.org/content/early/2022/05/20/2022.05.02.490310.full.pdf) for more details about the algorithm.
 
 ## Installing CellSpace
 
