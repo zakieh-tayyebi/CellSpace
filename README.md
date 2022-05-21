@@ -13,7 +13,7 @@ In order to learn a CellSpace embedding for scATAC-seq data, you will need to co
 
 ## Citation
 
-Please cite the [arXiv paper](https://www.biorxiv.org/content/early/2022/05/20/2022.05.02.490310) if you use CellSpace:
+Please cite the [arXiv paper](https://doi.org/10.1101/2022.05.02.490310) if you use CellSpace:
 ```
 @article {Tayyebi2022.05.02.490310,
 	author = {Tayyebi, Zakieh and Pine, Allison R. and Leslie, Christina S.},
@@ -22,8 +22,7 @@ Please cite the [arXiv paper](https://www.biorxiv.org/content/early/2022/05/20/2
 	year = {2022},
 	doi = {10.1101/2022.05.02.490310},
 	publisher = {Cold Spring Harbor Laboratory},
-	URL = {https://www.biorxiv.org/content/early/2022/05/20/2022.05.02.490310},
-	eprint = {https://www.biorxiv.org/content/early/2022/05/20/2022.05.02.490310.full.pdf},
+	URL = {https://doi.org/10.1101/2022.05.02.490310},
 	journal = {bioRxiv}
 }
 ```
