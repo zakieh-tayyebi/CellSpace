@@ -1,5 +1,6 @@
 library(ArchR)
 library(dplyr)
+library(stringr)
 
 addArchRThreads(threads = 8)
 addArchRGenome("hg19")
@@ -20,9 +21,15 @@ archr.obj <- addIterativeLSI(
 archr.obj <- addClusters(archr.obj, k.param = nn.k, resolution = c(0.4, 0.8, 1.0, 1.5)) %>%
   addUMAP(nNeighbors = nn.k)
 
-# SRA meta-data table from GEO
+sample.info <- read.csv("sample-info.csv", header = T)[, 1:2]
 SRA.tb <- read.table("SraRunTable.txt", sep = ",", header = T, stringsAsFactors = F, check.names = F)
-archr.obj$Celltype <- SRA.tb$cell_type[match(archr.obj$cellNames, paste0("GSE96769#", SRA.tb$Run))]
+SRA.tb$Title <- sample.info$Title[match(SRA.tb$`Sample Name`, sample.info$Accession)]
+SRA.tb$donor <- str_extract(SRA.tb$Title, "BM\\d+")
+SRA.tb$donor[grep("singles-MEP-141017", SRA.tb$Title)] <- "BM4983"
+archr.obj@cellColData <- cbind(
+  archr.obj@cellColData,
+  SRA.tb[match(archr.obj$cellNames, paste0("GSE96769#", SRA.tb$Run)), c("cell_type", "donor")]
+)
 
 saveArchRProject(archr.obj)
 write.csv(archr.obj@cellColData, file = "ArchROutput/cellColData.csv", quote = F)

@@ -62,6 +62,23 @@ setMethod(
   }
 )
 
+setMethod(
+  "$", "CellSpace",
+  function(x, name){
+    if(name %in% colnames(x@meta.data)){
+      return(x@meta.data[, name])
+    } else return(NULL)
+  }
+)
+
+setMethod(
+  "$<-", "CellSpace",
+  function(x, name, value){
+    x@meta.data[, name] <- value
+    return(x)
+  }
+)
+
 #' CellSpace
 #'
 #' Generates an object from the CellSpace class.

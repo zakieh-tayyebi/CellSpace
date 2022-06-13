@@ -3,7 +3,7 @@
 
 mkdir fastq
 i=0
-for sample in $(cat SRR_Acc_List.txt); do # SRA accession list from GEO
+for sample in $(cat SRR_Acc_List.txt); do
   let i++
 
   fastq-dump --split-3 --dumpbase --skip-technical --clip --read-filter pass --outdir fastq $sample

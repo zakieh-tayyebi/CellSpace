@@ -9,14 +9,14 @@ cell.md$ArchR.cluster <- cell.md$Clusters.res.0.8
 cso <- CellSpace(
   project = "GSE96769",
   emb.file = "CellSpace-results/GSE96769-embedding.tsv", # cell and k-mer embeddings
-  meta.data = cell.md[, c(16, 21)], # FAC-sorted celltypes and ArchR clusters
+  meta.data = cell.md[, c("cell_type", "donor", "ArchR.cluster")],
   cell.names = rownames(cell.md)
 )
 cso <- find_neighbors(cso, n.neighbors = 40) # NN and SNN graphs for cells
 cso <- find_clusters(cso, resolution = c(1, 1.5, 2)) # cell clusters
 write.csv(cso@meta.data, "CellSpace-results/cell-metadata.csv")
 
-cso <- run_UMAP(cso, n.neighbors = 40, min.dist = 0.1, spread = 1) # cell UMAP
+cso <- run_UMAP(cso, n.neighbors = 40, min.dist = 0.1, spread = 1) # CellSpace UMAP for cells (only)
 write.csv(cso@reductions$cells_UMAP, file = "CellSpace-results/UMAP-cells.csv")
 
 data(human_pwms_v1)
@@ -36,7 +36,7 @@ cso <- run_UMAP(
   object = cso, name = "cells_and_TFs_UMAP",
   emb = rbind(cso@cell.emb, hg.motif.emb[mi, ]),
   n.neighbors = 40, min.dist = 0.1, spread = 1
-) # CellSpace cell and TF UMAP
+) # CellSpace UMAP for cells and TFs
 write.csv(cso@reductions$cells_and_TFs_UMAP, file = "CellSpace-results/UMAP-cells_and_TFs.csv")
 
 TF.score <- cosine_similarity(x = cso@cell.emb, y = hg.motif.emb[mi, ]) %>% # cell-TF similarity
