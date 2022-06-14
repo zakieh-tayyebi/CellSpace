@@ -8,9 +8,9 @@ The final BAM file was inputted to [ArchR v1.0.1](pre-processing/4-ArchR.R), bar
 
 The selected tiles and their corresponding cell-by-tile counts matrix [were extracted](pre-processing/5-CellSpace_inputs.R) for training a CellSpace model.
 
-## [Training a CellSpace model](CellSpace-train.sh)
+## Training a CellSpace model
 
-A CellSpace model was trained with “--k 8 --sampleLen 150 --dim 30 --ngrams 3 --exmpPerPeak 20 --epoch 20” on the cell-by-tile count matrix and genomic sequences extracted from the corresponding tiles. The resulting CellSpace embedding for cells and k-mers (k = 8) was used for downstream analyses.
+A [CellSpace model was trained](CellSpace-train.sh) with “--k 8 --sampleLen 150 --dim 30 --ngrams 3 --exmpPerPeak 20 --epoch 20” on the cell-by-tile count matrix and genomic sequences extracted from the corresponding tiles. The [resulting CellSpace embedding](CellSpace-results/GSE96769-embedding.tsv) for cells and k-mers (k = 8) was used for downstream analyses.
 
 ## Downstream analyses
 
