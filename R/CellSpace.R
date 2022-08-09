@@ -46,7 +46,11 @@ setMethod(
     )
     if(ncol(object@meta.data) > 0){
       cat("Cell meta-data: ")
-      cat(colnames(object@meta.data), sep = ", ")
+      if(length(colnames(object@meta.data)) > 10){
+        cat(head(colnames(object@meta.data), 3), sep = ", ")
+        cat(", ..., ")
+        cat(tail(colnames(object@meta.data), 2), sep = ", ")
+      } else cat(colnames(object@meta.data), sep = ", ")
       cat("\n")
     }
     if(length(object@neighbors) > 0){
@@ -144,7 +148,9 @@ CellSpace <- function(
       k = k,
       similarity = similarity,
       p = p,
-      label = label
+      label = label,
+      neighbors = list(),
+      reductions = list()
   )
 }
 

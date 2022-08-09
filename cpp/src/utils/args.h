@@ -60,8 +60,9 @@ class Args {
     bool adagrad;
     bool isTrain;
     bool normalizeText;
-    bool saveEveryEpoch;
-    bool saveTempModel;
+    // bool saveEveryEpoch;
+    int saveEveryNEpochs;
+    // bool saveTempModel;
     bool shareEmb;
     bool useWeight;
     bool trainWord;

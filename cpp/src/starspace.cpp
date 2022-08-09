@@ -174,13 +174,10 @@ void StarSpace::train() {
   float best_valid_err = 1e9;
   auto t_start = std::chrono::high_resolution_clock::now();
   for (int i = 0; i < args_->epoch; i++) {
-    if (args_->saveEveryEpoch && i > 0) {
-      auto filename = args_->model;
-      if (args_->saveTempModel) {
-        filename = filename + "_epoch" + std::to_string(i);
-      }
+    if (args_->saveEveryNEpochs > 0 && i > 0 && i % args_->saveEveryNEpochs == 0) {
+      auto filename = args_->model + "_epoch" + std::to_string(i);
       // saveModel(filename);
-      saveModelTsv(filename);
+      saveModelTsv(filename + ".tsv");
     }
     cout << "Training epoch " << i << ": " << rate << ' ' << decrPerEpoch << endl;
     auto err = model_->train(trainData_, args_->thread,

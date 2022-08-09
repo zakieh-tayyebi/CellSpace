@@ -48,8 +48,9 @@ Args::Args() {
   bucket = 2000000;
   isTrain = true;
   shareEmb = true;
-  saveEveryEpoch = false;
-  saveTempModel = false;
+  // saveEveryEpoch = false;
+  saveEveryNEpochs = -1;
+  // saveTempModel = false;
   useWeight = false;
   trainWord = false;
   excludeLHS = false;
@@ -232,10 +233,12 @@ void Args::parseArgs(int argc, char** argv) {
     //   shareEmb = isTrue(string(argv[i + 1]));
     // } else if (strcmp(argv[i], "-normalizeText") == 0 && !isCellSpace) {
     //   normalizeText = isTrue(string(argv[i + 1]));
-    } else if (strcmp(argv[i], "-saveEveryEpoch") == 0) {
-      saveEveryEpoch = isTrue(string(argv[i + 1]));
-    } else if (strcmp(argv[i], "-saveTempModel") == 0) {
-      saveTempModel = isTrue(string(argv[i + 1]));
+    } else if (strcmp(argv[i], "-saveIntermediates") == 0) {
+      if(string(argv[i + 1]) == "final") saveEveryNEpochs = -1;
+      else saveEveryNEpochs = atoi(argv[i + 1]);
+      if(saveEveryNEpochs < 1) saveEveryNEpochs = -1;
+    // } else if (strcmp(argv[i], "-saveTempModel") == 0) {
+    //   saveTempModel = isTrue(string(argv[i + 1]));
     // } else if (strcmp(argv[i], "-useWeight") == 0 && !isCellSpace) {
     //   useWeight = isTrue(string(argv[i + 1]));
     // } else if (strcmp(argv[i], "-trainWord") == 0 && !isCellSpace) {
@@ -339,21 +342,22 @@ void Args::parseArgs(int argc, char** argv) {
       cerr << "exmpPerPeak must be >0" << endl;
       exit(EXIT_FAILURE);
     }
-  } else {
-    if (isTrain) {
-      if (model.empty()) {
-        cerr << "Empty output path." << endl;
-        printHelp();
-        exit(EXIT_FAILURE);
-      }
-    } else {
-      if (testFile.empty() || model.empty()) {
-        cerr << "Empty test file or model path." << endl;
-        printHelp();
-        exit(EXIT_FAILURE);
-      }
-    }
   }
+  // else {
+  //   if (isTrain) {
+  //     if (model.empty()) {
+  //       cerr << "Empty output path." << endl;
+  //       printHelp();
+  //       exit(EXIT_FAILURE);
+  //     }
+  //   } else {
+  //     if (testFile.empty() || model.empty()) {
+  //       cerr << "Empty test file or model path." << endl;
+  //       printHelp();
+  //       exit(EXIT_FAILURE);
+  //     }
+  //   }
+  // }
 }
 
 void Args::printHelp() {
@@ -362,40 +366,40 @@ void Args::printHelp() {
        << "\"CellSpace ...\"\n"
 
        << "\nThe following arguments are mandatory:\n"
-       << "  -output          output file to write the embedding matrix for cells and k-mers (.tsv)\n"
-       << "  -cpMat           sparse cell by peak/tile count matrix (.mtx)\n"
-       << "  -peaks           multi-fasta file containing peak/tile DNA sequences with the order they appear in the corresponding count matrix (.fa)\n"
-       // << "  -featEmb         optional embedding matrix to initialize k-mer embeddings from a previously trained CellSpace model (.tsv)\n"
+       << "  -output             prefix of the output\n"
+       << "  -cpMat              sparse cell by peak/tile count matrix (.mtx)\n"
+       << "  -peaks              multi-fasta file containing peak/tile DNA sequences with the order they appear in the corresponding count matrix (.fa)\n"
+       // << "  -featEmb          optional embedding matrix to initialize k-mer embeddings from a previously trained CellSpace model (.tsv)\n"
 
        << "\nThe following arguments are optional:\n"
-       << "  -dim             size of embedding vectors [" << dim << "]\n"
-       << "  -ngrams          max length of k-mer ngram [" << ngrams << "]\n"
-       << "  -k               k-mer length [" << k << "]\n"
-       << "  -sampleLen       length of the sequences randomly sampled from the peak/tile DNA sequences [" << (sampleLen == -1 ? "given" : to_string(sampleLen)) << "]\n"
-       << "  -exmpPerPeak     number of training examples per peak/tile [" << exmpPerPeak << "]\n"
-       << "  -epoch           number of epochs [" << epoch << "]\n"
-       // << "  -fixedFeatEmb    whether feature (k-mer) embeddings should be kept fixed [" << fixedFeatEmb << "]\n"
-       // << "  -batchLabels     whether the batch (i.e. dataset) should be included as a label (i.e. RHS) in training [" << batchLabels << "]\n"
-       << "  -margin          margin parameter in hinge loss. [" << margin << "]\n"
-       // << "  -similarity      takes value in [cosine, dot]. Whether to use cosine or dot product as similarity function in  hinge loss. [" << similarity << "]\n"
-       << "  -bucket          number of buckets [" << bucket << "]\n"
-       << "  -label           labels prefix [" << label << "]\n"
-       << "  -lr              learning rate [" << lr << "]\n"
-       << "  -maxTrainTime    max train time (seconds) [" << maxTrainTime << "]\n"
-       << "  -negSearchLimit  number of negative labels sampled per dataset [" << negSearchLimit << "]\n"
-       << "  -maxNegSamples   max number of negatives in a batch update [" << maxNegSamples << "]\n"
-       << "  -p               the embedding of an entity equals the sum of its M feature embedding vectors devided by M^p. [" << p << "]\n"
-       // << "  -adagrad         whether to use adagrad in training [" << adagrad << "]\n"
-       // << "  -shareEmb        whether to use the same embedding matrix for LHS and RHS. [" << shareEmb << "]\n"
-       // << "  -dropoutLHS      dropout probability for LHS features. [" << dropoutLHS << "]\n"
-       // << "  -dropoutRHS      dropout probability for RHS features. [" << dropoutRHS << "]\n"
-       << "  -initRandSd      initial values of embeddings are randomly generated from normal distribution with mean=0 and standard deviation=initRandSd. [" << initRandSd << "]\n"
-       << "  -batchSize       size of mini batch in training. [" << batchSize << "]\n"
-       // << "  -verbose         verbosity level [" << verbose << "]\n"
-       // << "  -debug           whether it's in debug mode [" << debug << "]\n"
-       // << "  -saveEveryEpoch  save intermediate models after each epoch [" << saveEveryEpoch << "]\n"
-       // << "  -saveTempModel   save intermediate models after each epoch with an unique name including epoch number [" << saveTempModel << "]\n"
-       << "  -thread          number of threads [" << thread << "]\n\n";
+       << "  -dim                size of embedding vectors [default=" << dim << "]\n"
+       << "  -ngrams             max length of k-mer ngram [default=" << ngrams << "]\n"
+       << "  -k                  k-mer length [default=" << k << "]\n"
+       << "  -sampleLen          length of the sequences randomly sampled from the peak/tile DNA sequences (integer or 'given') [default=" << (sampleLen == -1 ? "'given'" : to_string(sampleLen)) << "]\n"
+       << "  -exmpPerPeak        number of training examples per peak/tile [default=" << exmpPerPeak << "]\n"
+       << "  -epoch              number of epochs [default=" << epoch << "]\n"
+       // << "  -fixedFeatEmb     whether feature (k-mer) embeddings should be kept fixed [default=" << fixedFeatEmb << "]\n"
+       // << "  -batchLabels      whether the batch (i.e. dataset) should be included as a label (i.e. RHS) in training [default=" << batchLabels << "]\n"
+       << "  -margin             margin parameter in hinge loss [default=" << margin << "]\n"
+       // << "  -similarity       takes value in [cosine, dot]. Whether to use cosine or dot product as similarity function in  hinge loss [default=" << similarity << "]\n"
+       << "  -bucket             number of buckets [default=" << bucket << "]\n"
+       << "  -label              labels prefix [default='" << label << "']\n"
+       << "  -lr                 learning rate [default=" << lr << "]\n"
+       << "  -maxTrainTime       max train time (seconds) [default=" << maxTrainTime << "]\n"
+       << "  -negSearchLimit     number of negative labels sampled per dataset [default=" << negSearchLimit << "]\n"
+       << "  -maxNegSamples      max number of negatives in a batch update [default=" << maxNegSamples << "]\n"
+       << "  -p                  the embedding of an entity equals the sum of its M feature embedding vectors devided by M^p [default=" << p << "]\n"
+       // << "  -adagrad          whether to use adagrad in training [default=" << adagrad << "]\n"
+       // << "  -shareEmb         whether to use the same embedding matrix for LHS and RHS [default=" << shareEmb << "]\n"
+       // << "  -dropoutLHS       dropout probability for LHS features [default=" << dropoutLHS << "]\n"
+       // << "  -dropoutRHS       dropout probability for RHS features [default=" << dropoutRHS << "]\n"
+       << "  -initRandSd         initial values of embeddings are randomly generated from normal distribution with mean=0 and standard deviation=initRandSd [default=" << initRandSd << "]\n"
+       << "  -batchSize          size of mini batch in training [default=" << batchSize << "]\n"
+       // << "  -verbose          verbosity level [default=" << verbose << "]\n"
+       // << "  -debug            whether it's in debug mode [default=" << debug << "]\n"
+       << "  -saveIntermediates  save intermediate models or only the final model (integer or 'final') [default=" << (saveEveryNEpochs == -1 ? "'final'" : to_string(saveEveryNEpochs)) << "]\n"
+       // << "  -saveTempModel    save intermediate models after each epoch with an unique name including epoch number [default=" << saveTempModel << "]\n"
+       << "  -thread             number of threads [default=" << thread << "]\n\n";
     }
 }
 
@@ -404,12 +408,12 @@ void Args::printArgs() {
        << "dim: " << dim << endl
        << "ngrams: " << ngrams << endl
        << "k: " << k << endl
-       << "sampleLen: " << (sampleLen == -1 ? "given" : to_string(sampleLen)) << endl
+       << "sampleLen: " << (sampleLen == -1 ? "'given'" : to_string(sampleLen)) << endl
        << "exmpPerPeak: " << exmpPerPeak << endl
        << "epoch: " << epoch << endl
        << "margin: " << margin << endl
        << "bucket: " << bucket << endl
-       << "label: " << label << endl
+       << "label: '" << label << "'" << endl
        << "lr: " << lr << endl
        << "maxTrainTime: " << maxTrainTime << endl
        << "negSearchLimit: " << negSearchLimit << endl
@@ -417,6 +421,7 @@ void Args::printArgs() {
        << "p: " << p << endl
        << "initRandSd: " << initRandSd << endl
        << "batchSize: " << batchSize << endl
+       << "saveIntermediates: " << (saveEveryNEpochs == -1 ? "'final'" : to_string(saveEveryNEpochs)) << endl
        << "thread: " << thread << endl
        << "-----------------" << endl;
 }
