@@ -4,19 +4,10 @@
 \alias{run_UMAP}
 \title{run_UMAP}
 \usage{
-run_UMAP(
-  object,
-  n.neighbors = 30,
-  emb = object@cell.emb,
-  graph = NULL,
-  name = "cells_UMAP",
-  ...
-)
+run_UMAP(object, emb = object@cell.emb, graph = NULL, name = "cells_UMAP", ...)
 }
 \arguments{
 \item{object}{a \code{CellSpace} object}
-
-\item{n.neighbors}{the number of nearest neighbors for UMAP}
 
 \item{emb}{the embedding matrix used to compute the UMAP embedding}
 

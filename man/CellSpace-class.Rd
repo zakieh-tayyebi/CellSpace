@@ -19,6 +19,8 @@ related information needed for performing downstream analyses.
 
 \item{\code{kmer.emb}}{the embedding matrix for k-mers}
 
+\item{\code{motif.emb}}{the embedding matrix for TF motifs}
+
 \item{\code{meta.data}}{data frame containing meta-information about each cell}
 
 \item{\code{dim}}{the dimensions of the CellSpace embeddings}
@@ -34,5 +36,7 @@ related information needed for performing downstream analyses.
 \item{\code{neighbors}}{list containing nearest neighbor graphs}
 
 \item{\code{reductions}}{list containing dimensional reductions}
+
+\item{\code{misc}}{list containing miscellaneous objects}
 }}
 

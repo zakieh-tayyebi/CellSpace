@@ -8,6 +8,7 @@
 #' @slot emb.file the .tsv output of CellSpace containing the embedding matrix for cells and k-mers
 #' @slot cell.emb the embedding matrix for cells
 #' @slot kmer.emb the embedding matrix for k-mers
+#' @slot motif.emb the embedding matrix for TF motifs
 #' @slot meta.data data frame containing meta-information about each cell
 #' @slot dim the dimensions of the CellSpace embeddings
 #' @slot k the length of DNA k-mers
@@ -16,6 +17,7 @@
 #' @slot label cell label prefix
 #' @slot neighbors list containing nearest neighbor graphs
 #' @slot reductions list containing dimensional reductions
+#' @slot misc list containing miscellaneous objects
 #'
 #' @name CellSpace-class
 #' @rdname CellSpace-class
@@ -26,6 +28,7 @@ setClass("CellSpace", slots = list(
   emb.file = "character",
   cell.emb = "matrix",
   kmer.emb = "matrix",
+  motif.emb = "list",
   meta.data = "data.frame",
   dim = "integer",
   k = "integer",
@@ -33,7 +36,8 @@ setClass("CellSpace", slots = list(
   p = "numeric",
   label = "character",
   neighbors = "list",
-  reductions = "list"
+  reductions = "list",
+  misc = "list"
 ))
 
 setMethod(
@@ -44,6 +48,11 @@ setMethod(
     cat("CellSpace model: ", object@dim, "-dimensional embedding for ",
         nrow(object@cell.emb), " cells and all DNA k-mers (k=", object@k, ")\n", sep = ""
     )
+    if(length(object@motif.emb) > 0){
+      cat("TF motif embedding matrices: ")
+      cat(names(object@motif.emb), sep = ", ")
+      cat("\n")
+    }
     if(ncol(object@meta.data) > 0){
       cat("Cell meta-data: ")
       if(length(colnames(object@meta.data)) > 10){
@@ -61,6 +70,11 @@ setMethod(
     if(length(object@reductions) > 0){
       cat("Dimensional reductions calculated: ")
       cat(names(object@reductions), sep = ", ")
+      cat("\n")
+    }
+    if(length(object@misc) > 0){
+      cat("miscellaneous: ")
+      cat(names(object@misc), sep = ", ")
       cat("\n")
     }
   }
@@ -143,6 +157,7 @@ CellSpace <- function(
       emb.file = emb.file,
       cell.emb = cell.emb,
       kmer.emb = kmer.emb,
+      motif.emb = list(),
       meta.data = meta.data,
       dim = dim,
       k = k,
@@ -150,7 +165,8 @@ CellSpace <- function(
       p = p,
       label = label,
       neighbors = list(),
-      reductions = list()
+      reductions = list(),
+      misc = list()
   )
 }
 
@@ -220,7 +236,6 @@ find_clusters <- function(object, graph = "cells_snn", ...){
 #' @importFrom Seurat RunUMAP
 #'
 #' @param object a \code{CellSpace} object
-#' @param n.neighbors the number of nearest neighbors for UMAP
 #' @param emb the embedding matrix used to compute the UMAP embedding
 #' @param graph name of the nearest neighbor graph in the \code{neighbors} slot used to compute the UMAP embedding, used only if \code{emb} is NULL
 #' @param name name of the lower-dimensional embedding that will be added to the \code{reductions} slot
@@ -234,26 +249,23 @@ find_clusters <- function(object, graph = "cells_snn", ...){
 #'
 run_UMAP <- function(
   object,
-  n.neighbors = 30,
   emb = object@cell.emb,
   graph = NULL,
   name = "cells_UMAP",
   ...
 ){
-  if(!is.null(emb)){
+  if(!is.null(graph)){
+    if(graph %in% names(object@neighbors)){
+      umap <- RunUMAP(object = object@neighbors[[graph]], assay = "CellSpace", ...)
+    } else stop("\'", graph, "\' not available! Run \'find_neighbors\' to create nearest neighbor graphs.")
+  } else if(!is.null(emb)){
     umap <- RunUMAP(
       object = emb,
-      n.neighbors = n.neighbors,
       metric = object@similarity,
+      assay = "CellSpace",
       ...
     )
-  } else if(!is.null(graph)){
-    if(graph %in% names(object@neighbors)){
-      if(!is.null(n.neighbors))
-        warning("\'n.neighbors\' will be ignored! Using the pre-computed graph \'", graph, "\'.")
-      umap <- RunUMAP(object = object@neighbors[[graph]], ...)
-    } else stop("\'", graph, "\' not available! Run \'find_neighbors\' to create nearest neighbor graphs.")
-  }
+  } else stop("'emb' or 'graph' must be provided!")
   object@reductions[[name]] <- umap@cell.embeddings
   return(object)
 }
