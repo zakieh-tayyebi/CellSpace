@@ -2,6 +2,7 @@
 
 export(CellSpace)
 export(DNA_sequence_embedding)
+export(add_motif_db)
 export(cosine_similarity)
 export(embedding_distance)
 export(find_clusters)

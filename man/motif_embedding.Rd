@@ -9,7 +9,7 @@ motif_embedding(object, PWM)
 \arguments{
 \item{object}{a \code{CellSpace} object}
 
-\item{PWM}{position weight matrix or position frequency matrix}
+\item{PWM}{\code{PFMatrix} or \code{PWMatrix}}
 }
 \description{
 Map a motif to the embedding space.

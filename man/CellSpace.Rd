@@ -29,6 +29,9 @@ CellSpace(
 
 \item{label}{cell label prefix}
 }
+\value{
+a new \code{CellSpace} object
+}
 \description{
 Generates an object from the CellSpace class.
 }

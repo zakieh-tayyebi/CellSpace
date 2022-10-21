@@ -109,6 +109,8 @@ setMethod(
 #' @param p the embedding of an entity equals the sum of its M feature embedding vectors divided by M^p
 #' @param label cell label prefix
 #'
+#' @return a new \code{CellSpace} object
+#'
 #' @name CellSpace
 #' @rdname CellSpace
 #' @export
@@ -417,7 +419,7 @@ DNA_sequence_embedding <- function(object, seq){
 #' @importFrom Biostrings as.matrix
 #'
 #' @param object a \code{CellSpace} object
-#' @param PWM position weight matrix or position frequency matrix
+#' @param PWM \code{PFMatrix} or \code{PWMatrix}
 #'
 #' @name motif_embedding
 #' @rdname motif_embedding
@@ -428,3 +430,31 @@ motif_embedding <- function(object, PWM){
   consensus <- paste(rownames(freq.mtx)[apply(freq.mtx, 2, which.max)], collapse = "")
   DNA_sequence_embedding(object = object, seq = consensus)
 }
+
+#' add_motif_db
+#'
+#' Compute the CellSpace embedding and activity scores of transcription factor motifs.
+#'
+#' @param object a \code{CellSpace} object
+#' @param PWMs \code{PFMatrixList} or \code{PWMatrixList}
+#' @param db.name the name of the transcription factor motif database
+#'
+#' @return a \code{CellSpace} object containing the motif embedding matrix, in the \code{motif.emb} slot, and the corresponding similarity Z-scores, in the \code{misc} slot
+#'
+#' @name add_motif_db
+#' @rdname add_motif_db
+#' @export
+#'
+add_motif_db <- function(object, PWMs, db.name){
+  object@motif.emb[[db.name]] <- lapply(PWMs, function(motif.pwm){
+    motif_embedding(object, PWM = motif.pwm)
+  }) %>% do.call(what = rbind) %>% na.omit()
+
+  object@misc[[paste(db.name, "scores", sep = "_")]] <- cosine_similarity(
+    x = object@cell.emb,
+    y = object@motif.emb[[db.name]]
+  ) %>% scale()
+
+  return(object)
+}
+
