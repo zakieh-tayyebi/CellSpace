@@ -1,4 +1,4 @@
-# CellSpace v0.0.4
+# CellSpace v0.0.5
 
 CXX = g++
 CXXFLAGS = -pthread -std=gnu++11

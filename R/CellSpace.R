@@ -229,6 +229,65 @@ find_clusters <- function(object, graph = "cells_snn", ...){
   return(object)
 }
 
+#' merge_small_clusters
+#'
+#' Merge cells from small clusters with the nearest clusters.
+#'
+#' @param object a \code{CellSpace} object
+#' @param clusters a vector of cluster labels or the name of a column, in the \code{meta.data} slot, containing cluster labels
+#' @param min.cells any cluster with fewer cells than \code{min.cells} will be merged with the nearest cluster
+#' @param graph a nearest neighbor graph, or the name of a nearest neighbor graph in the \code{neighbors} slot, used to find clusters
+#'
+#' @return new cluster labels
+#'
+#' @name merge_small_clusters
+#' @rdname merge_small_clusters
+#' @export
+#'
+merge_small_clusters <- function(
+    object,
+    clusters,
+    min.cells = 10,
+    graph = "cells_snn",
+    seed = 1
+){
+  if(length(graph) == 1 && graph %in% names(object@neighbors)){
+    graph <- object@neighbors[[graph]]
+  } else if(class(graph) != "Graph")
+    stop("'graph' must be a nearest neighbor graph of class 'Graph'")
+
+  if(length(clusters) == 1 && clusters %in% colnames(object@meta.data)){
+    clusters <- object@meta.data[, clusters]
+  } else if(length(clusters) == nrow(graph)){
+    if(class(clusters) != "factor")
+      clusters <- factor(clusters)
+  } else stop("'clusters' must be the name of a column in 'object@meta.data', or a vector of the same length as the number of cells.")
+
+  small.clusters <- names(which(table(clusters) < min.cells)) %>% intersect(levels(clusters))
+  cluster_names <- setdiff(levels(clusters), small.clusters)
+  connectivity <- vector(mode = "numeric", length = length(cluster_names))
+  names(connectivity) <- cluster_names
+
+  new.ids <- clusters
+  for(i in small.clusters){
+    i.cells <- which(clusters == i)
+    for(j in cluster_names){
+      j.cells <- which(clusters == j)
+      subSNN <- graph[i.cells, j.cells]
+      if(is.object(subSNN)){
+        connectivity[j] <- sum(subSNN) / (nrow(subSNN) * ncol(subSNN))
+      } else connectivity[j] <- mean(subSNN)
+    }
+    set.seed(seed = seed)
+    m <- max(connectivity, na.rm = T)
+    mi <- which(connectivity == m, arr.ind = T)
+    closest_cluster <- sample(names(connectivity[mi]), 1)
+    new.ids[i.cells] <- closest_cluster
+  }
+
+  return(factor(new.ids, levels = cluster_names))
+}
+
 #' run_UMAP
 #'
 #' Compute a UMAP embedding from the CellSpace embedding.
