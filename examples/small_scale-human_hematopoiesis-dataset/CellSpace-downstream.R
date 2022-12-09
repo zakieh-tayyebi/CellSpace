@@ -65,7 +65,7 @@ write.csv(
 )
 
 # CellSpace embedding and activity scores for CisBP motifs:
-cisbp <- readRDS("Homo_sapiens_2022_09_04_8-24_pm/CisBP-PWMs.rds")
+cisbp <- readRDS("CisBP-Homo_sapiens_2022_09_04_8-24_pm/CisBP-PWMs.rds")
 cso <- add_motif_db(cso, PWMs = cisbp, db.name = "CisBP")
 write.csv(
   x = cso@motif.emb$CisBP,
