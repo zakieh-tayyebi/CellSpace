@@ -42,7 +42,7 @@ spread <- c(
 )
 
 emb.fn <- list.files(path = "embeddings/", pattern = "csv")
-clusters <- lapply(emb.fn, function(fn){
+clusters <- sapply(emb.fn, function(fn){
   metric <- ifelse(grepl("CellSpace", fn), "cosine", "euclidean")
   emb <- read.csv(paste0("embeddings/", fn), header = T, row.names = 1)
   emb <- as.matrix(emb[sample.info$Run, ])
@@ -66,7 +66,7 @@ clusters <- lapply(emb.fn, function(fn){
   cl.num <- sapply(1:ncol(cl), function(i){ length(levels(cl[, i])) })
   if(any(cl.num == num.clusters))
     return(cl[, which(cl.num == num.clusters)[1]])
-}) %>% do.call(what = cbind)
+}) %>% data.frame(row.names = sample.info$Run, check.names = F)
 colnames(clusters) <- gsub(".csv", "", emb.fn)
 write.csv(clusters, "benchmarking/Clusters.csv")
 
