@@ -73,25 +73,13 @@ write.csv(
 )
 
 # UMAP of cells and TFs in the same space:
-motifs1 <- c(
-  "M00155_2.00", "M00155_2.00", "M00805_2.00", "M01789_2.00", "M01817_2.00",
-  "M02751_2.00", "M02853_2.00", "M02963_2.00", "M03094_2.00", "M03760_2.00",
-  "M03760_2.00", "M04289_2.00", "M06201_2.00", "M06438_2.00", "M07814_2.00",
-  "M08138_2.00", "M08731_2.00", "M09174_2.00", "M09235_2.00", "M09251_2.00",
-  "M09294_2.00", "M09319_2.00", "M09650_2.00", "M10024_2.00", "M10024_2.00",
-  "M10024_2.00", "M10549_2.00"
-)
-motifs2 <- c(
-  "ENSG00000104903_LINE195_LYL1_I_N3",
-  "ENSG00000115415_LINE3478_STAT1_D_N1",
-  "ENSG00000117318_LINE151_ID3_I",
-  "ENSG00000196628_LINE303_TCF4_D_N3"
-)
+motifs <- read.csv("plots/TF-motifs.csv")
+motifs <- split(motifs, motifs$db)
 umap <- Seurat::RunUMAP(
   object = rbind(
     cso@cell.emb,
-    cso@motif.emb$CisBP[motifs1, ],
-    cso@motif.emb$chromVAR_human_v1[motifs2, ]
+    cso@motif.emb$CisBP[motifs$CisBP$motif, ],
+    cso@motif.emb$chromVAR_human_v1[motifs$chromVAR_human_v1$motif, ]
   ),
   metric = "cosine", n.neighbors = 50,
   min.dist = 0.2, spread = 1,
