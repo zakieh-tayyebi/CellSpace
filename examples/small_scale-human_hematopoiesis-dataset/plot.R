@@ -58,12 +58,14 @@ plot.continuous.value <- function(
           legend.title = et, legend.text = et)
 }
 
-pal <- readRDS("plots/palette.rds")
 cell.md <- read.table(
   file = "sample-info.tsv",
   sep = "\t", header = T, check.names = F
 ) %>% subset(!discard)
 rownames(cell.md) <- cell.md$Run
+
+pal <- readRDS("plots/palette.rds")
+cell.md$Cell_type <- factor(cell.md$Cell_type, levels = names(pal$Cell_type))
 
 
 # #####
@@ -220,4 +222,111 @@ emb.names <- c(
   `SIMBA-batch_corrected` = "SIMBA (batch-corrected)"
 )
 
+eval_metrics <- read.csv(
+  file = "benchmarking/metrics-summary.csv",
+  row.names = 1, check.names = F
+)
+eval_metrics <- lapply(colnames(eval_metrics), function(metric){
+  data.frame(
+    embedding = emb.names[rownames(eval_metrics)],
+    metric = metric,
+    value = eval_metrics[, metric]
+  )
+}) %>% do.call(what = rbind)
+
+mt.pal <- c(
+  HG = "#F9E600", ASW = "#FF7617", NMI = "#FF29D8", ARI = "#C50000",
+  bASW = "#00ED32", bNMI = "#0002A1", GC = "#00DEEC", kBET = "#8818FF"
+)
+sc <- scale_color_manual(values = mt.pal)
+sp <- rep(c(1, 2), c(4, 4)); names(sp) <- names(mt.pal)
+ss <- scale_shape_manual(values = sp)
+column <- rep(c("Biological Conservation", "Batch Correction"), each = 4)
+names(column) <- names(mt.pal)
+
+mapping <- aes(
+  x = factor(embedding, levels = as.character(emb.names)),
+  y = value, group = metric, color = metric, shape = metric
+)
+th <- theme(axis.text.x = element_text(angle = 90, size = 10, vjust = 0.5),
+            axis.title = element_blank())
+ggsave(
+  filename = "plots/SupFig2d.pdf", width = 5, height = 7,
+  plot =
+    ggplot(eval_metrics, mapping = mapping) +
+    geom_point() + geom_line() +
+    sc + ss + ylim(c(0, 1)) +
+    facet_wrap(~ column[metric], ncol = 1) +
+    theme_bw() + th
+)
+
+cell.md.exUnk <- subset(cell.md, Cell_type != "unknown")
+clusters <- read.csv(
+  file = "benchmarking/Clusters.csv",
+  row.names = 1, check.names = F, colClasses = "factor"
+)[cell.md.exUnk$Run, ]
+umap <- sapply(names(emb.names), function(emb){
+  read.csv(paste0("benchmarking/UMAP/", emb, ".csv"), row.names = 1)[cell.md.exUnk$Run, ]
+}, simplify = F)
+
+n <- length(emb.names) + 1
+lg.df <- cbind(umap[[1]], cell.md.exUnk)
+ps <- 1
+et <- element_text(size = 15)
+thm <- theme(title = et, axis.title = et, legend.title = et, legend.text = et)
+cg <- guides(colour = guide_legend(override.aes = list(size=10), title.hjust = 0.5, ncol=2))
+
+ct.pl <- lapply(names(emb.names), function(emb){
+  plot.groups(
+    vis = umap[[emb]], groups = cell.md.exUnk$Cell_type, pal = pal$Cell_type[-10],
+    add.labels = F, point.size = ps
+  ) + labs(x = "UMAP1", y = "UMAP2", title = emb.names[emb]) +
+    thm + theme(legend.position = "none")
+})
+ct.pl[[n]] <- get_legend(
+  plot.groups(
+    vis = lg.df[, 1:2], groups = lg.df$Cell_type, pal = pal$Cell_type[-10]
+  ) + labs(color = "Cell type") + thm + cg
+)
+ggsave(
+  plot = plot_grid(plotlist = ct.pl, ncol = 2),
+  width = 15, height = 35, filename = "plots/SupFig2a.pdf"
+)
+
+dn.pl <- lapply(names(emb.names), function(emb){
+  plot.groups(
+    vis = umap[[emb]], groups = cell.md.exUnk$Donor, pal = pal$Donor,
+    add.labels = F, point.size = ps
+  ) + labs(x = "UMAP1", y = "UMAP2", title = emb.names[emb]) +
+    thm + theme(legend.position = "none")
+})
+dn.pl[[n]] <- get_legend(
+  plot.groups(
+    vis = lg.df[, 1:2], groups = lg.df$Donor, pal = pal$Donor
+  ) + labs(color = "Donor") + thm + cg
+)
+ggsave(
+  plot = plot_grid(plotlist = dn.pl, ncol = 2),
+  width = 15, height = 35, filename = "plots/SupFig2b.pdf"
+)
+
+cl.pl <- lapply(names(emb.names), function(emb){
+  plot.groups(
+    vis = umap[[emb]], groups = clusters[, emb], pal = pal$Cluster[1:9],
+    add.labels = F, point.size = ps
+  ) + labs(x = "UMAP1", y = "UMAP2", title = emb.names[emb]) +
+    thm + theme(legend.position = "none")
+})
+cl.pl[[n]] <- get_legend(
+  plot.groups(
+    vis = lg.df[, 1:2], groups = clusters[, 1], pal = pal$Cluster[1:9]
+  ) + labs(color = "Cluster") + thm + cg
+)
+ggsave(
+  plot = plot_grid(plotlist = cl.pl, ncol = 2),
+  width = 15, height = 35, filename = "plots/SupFig2c.pdf"
+)
+
+
+# #####
 
