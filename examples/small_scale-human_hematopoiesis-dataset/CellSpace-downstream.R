@@ -4,7 +4,6 @@ library(CellSpace)
 library(JASPAR2020)
 library(chromVARmotifs)
 library(TFBSTools)
-library(Biostrings)
 library(parallel)
 library(dplyr)
 
@@ -38,8 +37,7 @@ cso <- CellSpace(
 write.csv(cso@cell.emb, "embeddings/CellSpace-var_tiles.csv")
 
 # clustering:
-cso <- find_neighbors(cso, n.neighbors = 20) %>%
-  find_clusters(resolution = 1.2)
+cso <- find_neighbors(cso, n.neighbors = 20) %>% find_clusters(resolution = 1.2)
 write.csv(
   data.frame(
     Cluster = as.integer(cso$Clusters.res_1.2),
@@ -72,18 +70,30 @@ write.csv(
   file = "CellSpace-results/var_tiles/TF_motif-embedding/CisBP.csv"
 )
 
-# UMAP of cells and TFs in the same space:
-motifs <- read.csv("plots/TF-motifs.csv")
-motifs <- split(motifs, motifs$db)
+# activity scores of (important) TFs:
+# 'motifs' is a data frame with columns 'TF' and 'motif'
+scores <- cbind(
+  cso@misc$JASPAR2020_scores,
+  cso@misc$chromVAR_human_v1_scores,
+  cso@misc$CisBP_scores
+)
+write.csv(
+  x = t(scores[, motifs$motif]), row.names = motifs$TF,
+  file = "CellSpace-results/var_tiles/TF_motif-embedding/selected-motif-scores.csv"
+)
+
+# UMAP of cells and (important) TFs in the same space:
+# 'motifs' is a data frame with columns 'TF' and 'motif'
+motif.emb <- rbind(
+  cso@motif.emb$JASPAR2020,
+  cso@motif.emb$chromVAR_human_v1,
+  cso@motif.emb$CisBP
+)[motifs$motif, ]
+rownames(motif.emb) <- motifs$TF
 umap <- Seurat::RunUMAP(
-  object = rbind(
-    cso@cell.emb,
-    cso@motif.emb$CisBP[motifs$CisBP$motif, ],
-    cso@motif.emb$chromVAR_human_v1[motifs$chromVAR_human_v1$motif, ]
-  ),
+  object = rbind(cso@cell.emb, motif.emb),
   metric = "cosine", n.neighbors = 50,
-  min.dist = 0.2, spread = 1,
-  seed.use = 1
+  min.dist = 0.2, spread = 1, seed.use = 1
 )@cell.embeddings %>% data.frame()
 write.csv(umap, file = "CellSpace-results/var_tiles/UMAP-cells_and_TFs.csv")
 

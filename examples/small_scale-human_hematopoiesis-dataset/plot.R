@@ -55,8 +55,7 @@ plot.continuous.value <- function(
     scale.color + theme_classic() +
     theme(axis.ticks = eb, axis.text = eb,
           axis.title = et, title = et,
-          legend.title = et, legend.text = et) +
-    guides(colour = guide_legend(override.aes = list(size = 5), title.hjust = 0.5))
+          legend.title = et, legend.text = et)
 }
 
 pal <- readRDS("plots/palette.rds")
@@ -65,22 +64,6 @@ cell.md <- read.table(
   sep = "\t", header = T, check.names = F
 ) %>% subset(!discard)
 rownames(cell.md) <- cell.md$Run
-
-emb.names <- c(
-  `CellSpace-var_tiles` = "CellSpace (var. tiles)",
-  `CellSpace-all_peaks` = "CellSpace (peaks)",
-  `itLSI_ArchR-var_tiles` = "ArchR itLSI (var. tiles)",
-  `LSI-all_peaks` = "LSI (peaks)",
-  `chromVAR-motifs` = "chromVAR (motifs)",
-  `chromVAR-kmers` = "chromVAR (kmers)",
-  `scBasset` = "scBasset (peaks)",
-  `scBasset-batch_corrected` = "scBasset (batch-corrected)",
-  `PeakVI` = "PeakVI (peaks)",
-  `PeakVI-batch_corrected` = "PeakVI (batch-corrected)",
-  `SIMBA-peaks` = "SIMBA (peaks)",
-  `SIMBA-peaks_kmers_motifs` = "SIMBA (peaks+kmers+motifs)",
-  `SIMBA-batch_corrected` = "SIMBA (batch-corrected)"
-)
 
 
 # #####
@@ -96,9 +79,13 @@ pl <- data.frame(
   pseudotime = read.csv("CellSpace-results/var_tiles/palantir/pseudotime.csv", row.names = 1)[, 1],
   branch_probs = read.csv("CellSpace-results/var_tiles/palantir/branch_probs.csv", row.names = 1)
 )
-motifs <- read.csv("plots/TF-motifs.csv")
+cs.scores <- read.csv(
+  file = "CellSpace-results/var_tiles/TF_motif-embedding/selected-motif-scores.csv",
+  row.names = 1, check.names = F
+)
+TFs <- rownames(cs.scores)
 
-nx <- rep(0, nrow(motifs)); names(nx) <- motifs$TF; ny <- nx
+nx <- rep(0, length(TFs)); names(nx) <- TFs; ny <- nx
 nx['EBF1'] <- -0.5; nx['PAX5'] <- 0.2; ny['EBF1'] <- 0.2;  ny['PAX5'] <- -0.5
 ggsave(
   filename = "plots/Fig2a.pdf", width = 8, height = 5,
@@ -106,9 +93,9 @@ ggsave(
     vis = umap[cell.md$Run, ], groups = cell.md$Cell_type,
     pal = pal$Cell_type, add.labels = F
   ) +
-  geom_point(data = umap[motifs$motif, ], color = "black", shape = 17, size = 1.5) +
+  geom_point(data = umap[TFs, ], color = "black", shape = 17, size = 1.5) +
   geom_label_repel(
-    mapping = aes(label = motifs$TF), data = umap[motifs$motif, ],
+    mapping = aes(label = TFs), data = umap[TFs, ],
     size = 3, fontface = "bold", min.segment.length = 0, label.padding = unit(0.5, "mm"),
     max.overlaps = Inf, segment.color = "black", segment.size = unit(0.2, "mm"),
     nudge_x = nx, nudge_y = ny
@@ -125,6 +112,29 @@ ggsave(
     )
   ) + labs(x = "UMAP1", y = "UMAP2", color = "Palantir\npseudotime")
 )
+
+pdf("plots/Fig3c.pdf", width = 10, height = 7)
+gp <- gpar(fontsize = 10)
+ta <- columnAnnotation(
+  df = cbind(
+    cell.md[, c("Cell_type", "Donor")],
+    Cluster = cl[cell.md$Run, "Cluster"]
+  ), col = pal
+)
+Heatmap(
+  as.matrix(cs.scores[TFs, cell.md$Run]), name = "Similarity\nz-score",
+  col = colorRamp2(c(-1, 0, 1), c("#007e8c", "white", "#a3005c")),
+  top_annotation = ta, column_split = cell.md$Cell_type,
+  column_title_rot = 90, show_column_names = F,
+  row_title_rot = 0, cluster_rows = F,
+  row_names_gp = gp, row_names_max_width = max_text_width(TFs, gp = gp),
+  use_raster = T
+) %>% draw(
+  heatmap_legend_side = "left",
+  annotation_legend_side = "left",
+  padding = unit(c(2, 2, 10, 2), "mm")
+)
+dev.off()
 
 plot_grid(
   plotlist = lapply(2:ncol(pl), function(i){
@@ -162,5 +172,52 @@ plot_grid(
   ) + labs(x = "UMAP1", y = "UMAP2", color = "CellSpace\nCluster"),
   ncol = 2
 ) %>% ggsave(filename = "plots/SupFig1b.pdf", width = 16, height = 5)
+
+
+# #####
+archr.res <- read.csv(
+  file = "ArchR-results/UMAP_and_Clusters.csv",
+  row.names = 1, header = T
+)
+archr.res$Cluster <- factor(archr.res$Cluster)
+
+ggsave(
+  filename = "plots/Fig2d.pdf", width = 8, height = 5,
+  plot.groups(
+    vis = archr.res[cell.md$Run, 1:2], groups = cell.md$Cell_type,
+    sy = 1, nx = c(MPP = -2),
+    pal = pal$Cell_type, add.labels = T
+  ) + labs(x = "UMAP1", y = "UMAP2", color = "Cell type")
+)
+
+plot_grid(
+  plot.groups(
+    vis = archr.res[cell.md$Run, 1:2], add.labels = F,
+    groups = cell.md$Donor, pal = pal$Donor
+  ) + labs(x = "UMAP1", y = "UMAP2", color = "Donor"),
+  plot.groups(
+    vis = archr.res[cell.md$Run, 1:2], sy = 0.5,
+    groups = archr.res[cell.md$Run, "Cluster"], pal = pal$Cluster[1:14]
+  ) + labs(x = "UMAP1", y = "UMAP2", color = "ArchR\nCluster"),
+  ncol = 2
+) %>% ggsave(filename = "plots/SupFig1c.pdf", width = 16, height = 5)
+
+
+# #####
+emb.names <- c(
+  `CellSpace-var_tiles` = "CellSpace (var. tiles)",
+  `CellSpace-all_peaks` = "CellSpace (peaks)",
+  `itLSI_ArchR-var_tiles` = "ArchR itLSI (var. tiles)",
+  `LSI-all_peaks` = "LSI (peaks)",
+  `chromVAR-motifs` = "chromVAR (motifs)",
+  `chromVAR-kmers` = "chromVAR (kmers)",
+  `scBasset` = "scBasset (peaks)",
+  `scBasset-batch_corrected` = "scBasset (batch-corrected)",
+  `PeakVI` = "PeakVI (peaks)",
+  `PeakVI-batch_corrected` = "PeakVI (batch-corrected)",
+  `SIMBA-peaks` = "SIMBA (peaks)",
+  `SIMBA-peaks_kmers_motifs` = "SIMBA (peaks+kmers+motifs)",
+  `SIMBA-batch_corrected` = "SIMBA (batch-corrected)"
+)
 
 
