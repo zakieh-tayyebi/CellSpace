@@ -253,12 +253,11 @@ th <- theme(axis.text.x = element_text(angle = 90, size = 10, vjust = 0.5),
             axis.title = element_blank())
 ggsave(
   filename = "plots/SupFig2d.pdf", width = 4, height = 6,
-  plot =
-    ggplot(eval_metrics, mapping = mapping) +
-    geom_point() + geom_line() +
-    sc + ss + ylim(c(0, 1)) +
-    facet_wrap(~ column[metric], ncol = 1) +
-    theme_bw() + th
+  ggplot(eval_metrics, mapping = mapping) +
+  geom_point() + geom_line() +
+  sc + ss + ylim(c(0, 1)) +
+  facet_wrap(~ column[metric], ncol = 1) +
+  theme_bw() + th
 )
 
 cell.md.exUnk <- subset(cell.md, Cell_type != "unknown")
