@@ -4,12 +4,12 @@ setwd("~/CellSpace/examples/small_scale-human_hematopoiesis-dataset/")
 library(ggplot2)
 library(grid)
 library(ggrepel)
+library(ggdendro)
+library(ggseqlogo)
 library(cowplot)
 library(ComplexHeatmap)
 library(circlize)
 library(dplyr)
-
-set.seed(1)
 
 plot.groups <- function(
     vis, mapping = aes(x = UMAP_1, y = UMAP_2),
@@ -329,4 +329,96 @@ ggsave(
 
 
 # #####
+load("CellSpace-results/var_tiles/denovo-motifs/top-10mers-clustering.rda")
+load("CellSpace-results/var_tiles/denovo-motifs/denovo-PWMs.rda")
+umap.denovo <- read.csv(
+  file = "CellSpace-results/var_tiles/denovo-motifs/UMAP-cells_and_motifs.csv",
+  row.names = 1
+)
+C <- table(cl.10mers)
+C <- as.integer(names(C[C >= 4]))
+
+dd <- dendro_data(dend.10mers)
+dd$labels$cluster <- factor(cl.10mers[dd$labels$label], levels = C)
+align <- lapply(C, function(cl){
+  X <- subset(dd$labels, cluster == cl)$x
+  data.frame(
+    x = c(mean(X), sort(X)),
+    y = c(-3.5, rep(-1.5, length(X))),
+    label = c(
+      paste("motif", match(cl, C)),
+      as.character(align.cl.10mers[[cl]])
+    ),
+    cluster = rep(factor(cl, levels = C), length(X) + 1)
+  )
+}) %>% do.call(what = rbind)
+ggsave(
+  plot = ggplot(mapping = aes(x = x, y = y)) +
+    geom_segment(aes(xend = xend, yend = yend), dd$segments) +
+    geom_text(
+      aes(label = label, color = cluster), rbind(dd$labels, align),
+      size = 2, show.legend = F, hjust = -0.1, family = "mono"
+    ) +
+    scale_y_reverse(expand = c(0.5, 0.2)) +
+    scale_x_continuous(expand = c(0.01, 0.01)) +
+    coord_flip() + theme_void(),
+  filename = "plots/SupFig1d.pdf", width = 5, height = 30
+)
+
+dummy <- lapply(C, function(cl){
+  m <- paste0("motif", match(cl, C))
+  pwm <- denovo.PWMs[[cl]]
+  ggsave(
+    plot = ggseqlogo(pwm, method = 'prob') + ggtitle(m),
+    width = ncol(pwm) / 2 + 0.5, height = 2,
+    filename =  paste0("plots/Fig2e-logos/denovo-", m, ".pdf")
+  )
+}) %>% do.call(what = c)
+
+cisbp.pwms <- readRDS("CisBP-Homo_sapiens_2022_09_04_8-24_pm/CisBP-PWMs.rds")
+known.motif <- c(
+  M08841_2.00 = "M08841_2.00 (CEBPA, CEBPB, CEBPE)",
+  M07997_2.00 = "M07997_2.00 (PAX2, PAX5, ...)",
+  M09795_2.00 = "M09795_2.00 (TCF3, TCF4, TCF12)",
+  M02210_2.00 = "M02210_2.00 (HOXA4, HOXB4, TLX1, ...)",
+  M03336_2.00 = "M03336_2.00 (IRF4, IRF8)",
+  M08126_2.00 = "M08126_2.00 (GATA1, GATA2, GATA3, ...)",
+  M09617_2.00 = "M09617_2.00 (RARA, RORA, RORC, ...)",
+  M03018_2.00 = "M03018_2.00 (FOXP3, FOXI1, FOXJ1, ...)",
+  M10596_2.00 = "M10596_2.00 (GATA1, GATA2, GATA3, ...)",
+  M08207_2.00 = "M08207_2.00 (GATA1, GATA2, GATA3, ...)",
+  M09430_2.00 = "M09430_2.00 (TBX4, TBX5, TBX15, ...)",
+  M08192_2.00 = "M08192_2.00 (PRDM1)",
+  M05572_2.00 = "M05572_2.00 (ESRRA, RARA, RORA, RORC, ...)"
+)
+rc <- rep(F, length(known.motif)); names(rc) <- names(known.motif)
+rc[c("M07997_2.00", "M02210_2.00", "M10596_2.00", "M09795_2.00")] <- T
+dummy <- lapply(names(known.motif), function(id){
+  pwm <- (exp(as.matrix(cisbp.pwms[[id]])) / 4) %>%
+    apply(2, function(x){ x / sum(x) })
+  if(rc[id]){ # reverse complement the known motif
+    pwm.rc <- pwm[, ncol(pwm):1]
+    rownames(pwm.rc) <- c(A = "T", C = "G", G = "C", `T` = "A")[rownames(pwm.rc)]
+    pwm <- pwm.rc
+  }
+  ggsave(
+    plot = ggseqlogo(pwm, method = 'prob') + ggtitle(known.motif[id]),
+    width = ncol(pwm) / 2 + 0.5, height = 2,
+    filename =  paste0("plots/Fig2e-logos/known-", id, ".pdf")
+  )
+}) %>% do.call(what = c)
+
+mn <- paste("motif", 1:29)
+ggsave(
+  filename = "plots/Fig2e-UMAP.pdf", width = 8, height = 5,
+  plot.groups(
+    vis = umap.denovo[cell.md$Run, ], groups = cell.md$Cell_type,
+    pal = pal$Cell_type, add.labels = F
+  ) + geom_point(data = umap.denovo[mn, ], color = "black", shape = 17, size = 1) +
+  geom_label_repel(
+    mapping = aes(label = mn), data = umap.denovo[mn, ],
+    size = 3, fontface = "bold", min.segment.length = 0, label.padding = unit(0.4, "mm"),
+    max.overlaps = Inf, segment.color = "black", segment.size = unit(0.2, "mm")
+  ) + labs(x = "UMAP1", y = "UMAP2", color = "Cell type")
+)
 
