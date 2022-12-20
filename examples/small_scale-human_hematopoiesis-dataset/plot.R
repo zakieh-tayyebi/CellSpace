@@ -222,6 +222,16 @@ emb.names <- c(
   `SIMBA-batch_corrected` = "SIMBA (batch-corrected)"
 )
 
+mt.pal <- c(
+  HG = "#F9E600", ASW = "#FF7617", NMI = "#FF29D8", ARI = "#C50000",
+  bASW = "#00ED32", bNMI = "#0002A1", GC = "#00DEEC", kBET = "#8818FF"
+)
+sc <- scale_color_manual(values = mt.pal)
+sp <- rep(c(1, 2), c(4, 4)); names(sp) <- names(mt.pal)
+ss <- scale_shape_manual(values = sp)
+column <- rep(c("Biological Conservation", "Batch Correction"), each = 4)
+names(column) <- names(mt.pal)
+
 eval_metrics <- read.csv(
   file = "benchmarking/metrics-summary.csv",
   row.names = 1, check.names = F
@@ -233,16 +243,7 @@ eval_metrics <- lapply(colnames(eval_metrics), function(metric){
     value = eval_metrics[, metric]
   )
 }) %>% do.call(what = rbind)
-
-mt.pal <- c(
-  HG = "#F9E600", ASW = "#FF7617", NMI = "#FF29D8", ARI = "#C50000",
-  bASW = "#00ED32", bNMI = "#0002A1", GC = "#00DEEC", kBET = "#8818FF"
-)
-sc <- scale_color_manual(values = mt.pal)
-sp <- rep(c(1, 2), c(4, 4)); names(sp) <- names(mt.pal)
-ss <- scale_shape_manual(values = sp)
-column <- rep(c("Biological Conservation", "Batch Correction"), each = 4)
-names(column) <- names(mt.pal)
+eval_metrics$metric <- factor(eval_metrics$metric, levels = names(mt.pal))
 
 mapping <- aes(
   x = factor(embedding, levels = as.character(emb.names)),
@@ -251,7 +252,7 @@ mapping <- aes(
 th <- theme(axis.text.x = element_text(angle = 90, size = 10, vjust = 0.5),
             axis.title = element_blank())
 ggsave(
-  filename = "plots/SupFig2d.pdf", width = 5, height = 7,
+  filename = "plots/SupFig2d.pdf", width = 4, height = 6,
   plot =
     ggplot(eval_metrics, mapping = mapping) +
     geom_point() + geom_line() +
