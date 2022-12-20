@@ -1,4 +1,3 @@
-
 #' The CellSpace Class
 #'
 #' The CellSpace class stores CellSpace embedding and

@@ -1,10 +1,12 @@
 setwd("~/CellSpace/examples/small_scale-human_hematopoiesis-dataset/")
 
+source("pre-processing/all_peaks/LSI-functions.R") # ArchR functions
 library(GenomicRanges)
 library(Matrix)
 library(data.table)
 library(dplyr)
 library(BSgenome.Hsapiens.UCSC.hg19)
+
 genome <- BSgenome.Hsapiens.UCSC.hg19
 
 # downloaded from GEO (GSE96769):
@@ -36,13 +38,15 @@ counts <- sparseMatrix(
   dimnames = list(cellname, as.character(peaks.gr))
 ) %>% t()
 
+# cells filtered by ArchR (pre-processing/var_tiles/5-ArchR.R):
 sample.info <- read.table(
   file = "sample-info.tsv",
   sep = "\t", header = T, check.names = F
-) %>% subset(!discard) # cells filtered by ArchR (pre-processing/var_tiles/5-ArchR.R)
+) %>% subset(!discard)
 ci <- match(sample.info$Title, colnames(counts))
 counts <- counts[, ci]
 
+# filter peaks
 pi <- !(peaks$chr %in% c("chrX", "chrY", "chrM")) &
   !grepl("promoter", peaks$annot) &
   (rowSums(counts > 0) >= 5)
@@ -51,6 +55,22 @@ counts <- counts[pi, ]
 
 saveRDS(peaks.gr, file = "pre-processing/all_peaks/GSE96769-filtered_peaks.rds")
 saveRDS(counts, file = "pre-processing/all_peaks/GSE96769-filtered_counts.rds")
+
+# compute LSI for filtered peak-by-cell count matrix:
+LSI <- computeLSI(
+  mat = counts,
+  LSIMethod = 2,
+  scaleTo = 10000,
+  nDimensions = 30,
+  outlierQuantiles = c(0.02, 0.98)
+)
+
+# LSI embedding for benchmarking:
+write.csv(
+  x = scaleDims(LSI$matSVD),
+  row.names = sample.info$Run[match(colnames(counts), sample.info$Title)],
+  file = "embeddings/LSI-all_peaks.csv"
+)
 
 # input for CellSpace (CellSpace-train-all_peaks.sh):
 getSeq(peaks.gr, x = genome) %>%
