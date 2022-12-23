@@ -2,6 +2,7 @@ setwd("~/CellSpace/examples/small_scale-human_hematopoiesis-dataset/")
 
 source("pre-processing/all_peaks/LSI-functions.R") # ArchR functions
 library(GenomicRanges)
+library(Biostrings)
 library(Matrix)
 library(data.table)
 library(dplyr)
