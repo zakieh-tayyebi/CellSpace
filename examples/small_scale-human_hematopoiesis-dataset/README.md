@@ -1,6 +1,6 @@
-## Small-scale human hematopoiesis dataset
+# Small-scale human hematopoiesis dataset
 
-### Pre-processing scATAC-seq data
+## Pre-processing scATAC-seq data
 
 #### [Variable tiles](pre-processing/var_tiles/)
 
@@ -8,21 +8,20 @@
 2.  Trimming adapter sequences,
 3.  Aligning reads to the reference genome,
 4.  Filtering and sorting the alignments,
-5.  Filtering fragments and cells with ArchR (QC and doublet removal), performing iterative LSI (as the ArchR itLSI embedding), and preparing CellSpace inputs (var. tiles).
+5.  Filtering fragments and cells with ArchR (quality-control and doublet removal), performing iterative LSI (as the ArchR itLSI embedding), and preparing CellSpace inputs (var. tiles).
 
 #### [All peaks](pre-processing/all_peaks/)
 
 1.  Downloading peak-by-cell count matrix from GEO,
 2.  Filtering cells (filtered by ArchR previously) and peaks,
-3.  Computing LSI embedding (all peaks),
-4.  Preparing CellSpace inputs (all peaks).
+3.  Computing LSI embedding (all peaks), and preparing CellSpace inputs (all peaks).
 
-### Training a CellSpace model
+## Training a CellSpace model
 
 -   [**Variable tiles**](CellSpace-train-var_tiles.sh)
 -   [**All peaks**](CellSpace-train-all_peaks.sh)
 
-### Downstream analyses
+## Downstream analyses
 
 #### ArchR itLSI (var. tiles)
 
@@ -40,6 +39,6 @@
 -   [Each embedding was used to compute a UMAP embedding and cluster the cells, excluding the 'unknown' cell type.](benchmarking-Cluster_and_UMAP.R)
 -   [The embedding and clustering results from each method were evaluated by biological conservation and batch correction metrics.](benchmarking-compute_metrics.py)
 
-### Visualizing the results
+## Visualizing the results
 
 All the figures related to this dataset in [our paper](https://doi.org/10.1101/2022.05.02.490310) were [visualized](plot.R) with the data available in this repository. These figures are available in ['plots/'](plots/).
