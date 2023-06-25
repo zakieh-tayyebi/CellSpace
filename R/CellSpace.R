@@ -436,8 +436,6 @@ motif_embedding <- function(object, PWM){
 #'
 #' Compute the CellSpace embedding and activity scores of transcription factor motifs.
 #'
-#' @importFrom Biostrings reverseComplement DNAStringSet
-#'
 #' @param object a \code{CellSpace} object
 #' @param motif.db \code{PFMatrixList} or \code{PWMatrixList}
 #' @param db.name the name of the transcription factor motif database
@@ -449,7 +447,7 @@ motif_embedding <- function(object, PWM){
 #' @export
 #'
 add_motif_db <- function(object, motif.db, db.name){
-  object@motif.emb[[db.name]] <- lapply(PWMs, function(motif.pwm){
+  object@motif.emb[[db.name]] <- lapply(motif.db, function(motif.pwm){
     motif_embedding(object, PWM = motif.pwm)
   }) %>% do.call(what = rbind) %>% na.omit()
 
