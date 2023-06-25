@@ -10,11 +10,11 @@ First, you will need to install the following **R** packages: \* [devtools](http
 
 Then, in order to install and use CellSpace in **R**, run the following commands:
 
-    devtools::install_github("https://github.com/zakieh-tayyebi/CellSpace.git")
-    library(CellSpace)
+```         
+devtools::install_github("https://github.com/zakieh-tayyebi/CellSpace.git")
+library(CellSpace)
+```
 
 ## Documentation
 
-Please see [the documentation](../man/) for CellSpace **R** functions and [examples](../examples/) of using them.
-
-This package is not available in [CRAN](https://cran.r-project.org) yet!
+Please see [the documentation](../man/) for CellSpace **R** functions. This package is not available in [CRAN](https://cran.r-project.org) yet!

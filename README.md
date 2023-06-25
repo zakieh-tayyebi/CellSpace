@@ -6,7 +6,7 @@ CellSpace is an efficient and scalable sequence-informed embedding method for sc
 
 See our [pre-print](https://www.biorxiv.org/content/10.1101/2022.05.02.490310v3.full.pdf) for more details.
 
-In order to learn a CellSpace embedding for scATAC-seq data, you will need to compile and run the [C++ code](cpp/). We use [R](R/) for downstream analyses. See the [examples](examples/) presented in [our paper](https://www.biorxiv.org/content/10.1101/2022.05.02.490310v3.full.pdf).
+In order to learn a CellSpace embedding for scATAC-seq data, you will need to compile and run the [C++ code](cpp/). We use [R](R/) for downstream analyses.
 
 <p align="center">
 
