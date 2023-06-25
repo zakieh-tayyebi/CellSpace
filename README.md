@@ -8,7 +8,11 @@ See our [pre-print](https://www.biorxiv.org/content/10.1101/2022.05.02.490310v3.
 
 In order to learn a CellSpace embedding for scATAC-seq data, you will need to compile and run the [C++ code](cpp/). We use [R](R/) for downstream analyses.
 
-![Learning a CellSpace embedding from single-cell ATAC-seq data.](CellSpace.png){width="70%"} <br> Learning a CellSpace embedding from single-cell ATAC-seq data.
+<p align="center">
+
+<img src="CellSpace.png" width="70%"/> <br> Learning a CellSpace embedding from single-cell ATAC-seq data.
+
+</p>
 
 ## Citation
 
