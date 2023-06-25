@@ -8,11 +8,7 @@ See our [pre-print](https://www.biorxiv.org/content/10.1101/2022.05.02.490310v3.
 
 In order to learn a CellSpace embedding for scATAC-seq data, you will need to compile and run the [C++ code](cpp/). We use [R](R/) for downstream analyses.
 
-<p align="center">
-
-<img src="CellSpace.png" width="70%"/> <br> Learning a CellSpace embedding from single-cell ATAC-seq data.
-
-</p>
+![Learning a CellSpace embedding from single-cell ATAC-seq data.](CellSpace.png){width="70%"} <br> Learning a CellSpace embedding from single-cell ATAC-seq data.
 
 ## Citation
 
@@ -33,5 +29,5 @@ Please cite the [arXiv paper](https://doi.org/10.1101/2022.05.02.490310) if you 
 
 ## Contact
 
--   [zakieh.tayyebi\@gmail.com](mailto:zakieh.tayyebi@gmail.com){.email} (Zakieh Tayyebi)
--   [cleslie\@cbio.mskcc.org](mailto:cleslie@cbio.mskcc.org){.email} (Christina S. Leslie)
+-   [zakieh.tayyebi\@gmail.com](mailto:zakieh.tayyebi@gmail.com) (Zakieh Tayyebi)
+-   [lesliec\@mskcc.org](mailto:lesliec@mskcc.org) (Christina S. Leslie, PhD)
