@@ -367,11 +367,12 @@ cosine_similarity <- function(x, y = NULL){
 #' @rdname embedding_distance
 #' @export
 #'
-embedding_distance <- function(x, y = NULL, distance = "cosine"){
+embedding_distance <- function(x, y = NULL, distance = c("cosine", "angular")){
   s <- cosine_similarity(x = x, y = y)
   idx1 <- which(s >  1); s[idx1] <-  1
   idx2 <- which(s < -1); s[idx2] <- -1
 
+  distance <- distance[1]
   if(distance == "cosine"){ ds <- 1 - s
   } else if(distance == "angular"){ ds <- acos(s) / pi
   } else stop("The distance metric must be \'cosine\' or \'angular\'!\n")
@@ -401,14 +402,15 @@ DNA_sequence_embedding <- function(object, seq){
 
   b <- 1:(sl - object@k + 1)
   kmers <- substring(text = toupper(seq), first = b, last = b + object@k - 1)
-  kmers.rc <- toupper(as.character(reverseComplement(DNAStringSet(kmers))))
-  kmer.rownames <- c(kmers[kmers %in% rownames(object@kmer.emb)],
-                     kmers.rc[kmers.rc %in% rownames(object@kmer.emb) & kmers.rc != kmers])
-  kn <- length(kmer.rownames)
+  kmers <- ifelse(
+    test = kmers %in% rownames(object@kmer.emb),
+    yes = kmers,
+    no = toupper(as.character(reverseComplement(DNAStringSet(kmers))))
+  )
 
-  if(kn != sl - object@k + 1) stop("Invalid DNA sequence \'", seq, "\'!")
-  if(kn == 1) return(object@kmer.emb[kmer.rownames, ])
-  else return(colSums(object@kmer.emb[kmer.rownames, ]) / (kn ^ object@p))
+  kn <- length(kmers)
+  if(kn == 1) return(object@kmer.emb[kmers, ])
+  else return(colSums(object@kmer.emb[kmers, ]) / (kn ^ object@p))
 }
 
 #' motif_embedding
@@ -425,8 +427,8 @@ DNA_sequence_embedding <- function(object, seq){
 #' @export
 #'
 motif_embedding <- function(object, PWM){
-  freq.mtx <- as.matrix(PWM)
-  consensus <- paste(rownames(freq.mtx)[apply(freq.mtx, 2, which.max)], collapse = "")
+  pwm <- as.matrix(PWM)
+  consensus <- paste(rownames(pwm)[apply(pwm, 2, which.max)], collapse = "")
   DNA_sequence_embedding(object = object, seq = consensus)
 }
 
@@ -434,8 +436,10 @@ motif_embedding <- function(object, PWM){
 #'
 #' Compute the CellSpace embedding and activity scores of transcription factor motifs.
 #'
+#' @importFrom Biostrings reverseComplement DNAStringSet
+#'
 #' @param object a \code{CellSpace} object
-#' @param PWMs \code{PFMatrixList} or \code{PWMatrixList}
+#' @param motif.db \code{PFMatrixList} or \code{PWMatrixList}
 #' @param db.name the name of the transcription factor motif database
 #'
 #' @return a \code{CellSpace} object containing the motif embedding matrix, in the \code{motif.emb} slot, and the corresponding similarity Z-scores, in the \code{misc} slot
@@ -444,7 +448,7 @@ motif_embedding <- function(object, PWM){
 #' @rdname add_motif_db
 #' @export
 #'
-add_motif_db <- function(object, PWMs, db.name){
+add_motif_db <- function(object, motif.db, db.name){
   object@motif.emb[[db.name]] <- lapply(PWMs, function(motif.pwm){
     motif_embedding(object, PWM = motif.pwm)
   }) %>% do.call(what = rbind) %>% na.omit()
