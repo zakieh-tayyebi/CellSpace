@@ -61,7 +61,7 @@ Args::Args() {
   similarity = "cosine";
   ngrams = 3;
   dim = 30;
-  epoch = 20;
+  epoch = 50;
   exmpPerPeak = 20;
   k = 8;
   sampleLen = 150;

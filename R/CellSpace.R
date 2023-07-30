@@ -1,6 +1,6 @@
 #' The CellSpace Class
 #'
-#' The CellSpace class stores CellSpace embedding and
+#' The \code{CellSpace} class stores CellSpace embedding and
 #' related information needed for performing downstream analyses.
 #'
 #' @slot project title of the project
@@ -12,7 +12,7 @@
 #' @slot dim the dimensions of the CellSpace embeddings
 #' @slot k the length of DNA k-mers
 #' @slot similarity the similarity function in hinge loss
-#' @slot p the embedding of an entity equals the sum of its M feature embedding vectors divided by M^p
+#' @slot p the embedding of an entity equals the sum of its \code{M} feature embedding vectors divided by \code{M^p}
 #' @slot label cell label prefix
 #' @slot neighbors list containing nearest neighbor graphs
 #' @slot reductions list containing dimensional reductions
@@ -98,14 +98,14 @@ setMethod(
 
 #' CellSpace
 #'
-#' Generates an object from the CellSpace class.
+#' Generates an object from the \code{CellSpace} class.
 #'
 #' @param emb.file the .tsv output of CellSpace containing the embedding matrix for cells and k-mers
 #' @param cell.names vector of unique cell names
 #' @param meta.data a \code{data.frame} containing meta-information about each cell
 #' @param project title of the project
 #' @param similarity the similarity function in hinge loss
-#' @param p the embedding of an entity equals the sum of its M feature embedding vectors divided by M^p
+#' @param p the embedding of an entity equals the sum of its \code{M} feature embedding vectors divided by \code{M^p}
 #' @param label cell label prefix
 #'
 #' @return a new \code{CellSpace} object
@@ -134,23 +134,34 @@ CellSpace <- function(
   cell.labels <- rownames(emb)[grep(cell.label, rownames(emb))]
   cell.idx <- sort(as.integer(gsub(cell.label, "", cell.labels)))
   cell.emb <- as.matrix(emb[paste0(cell.label, cell.idx), ])
-  if(!is.null(cell.names)){
-    if(length(cell.names) != nrow(cell.emb) || any(duplicated(cell.names))){
-      warning("Unable to change cell names: \'cell.names\' must be a character vector with ", nrow(cell.emb), " unique values!")
-    } else rownames(cell.emb) <- cell.names
-  }
 
   kmer.emb <- as.matrix(emb[!grepl(label, rownames(emb)), ])
   k <- unique(nchar(rownames(kmer.emb)))
   if(length(k) > 1) stop("Varying k-mer lengths!")
 
-  if(is.null(meta.data)){
-    meta.data <- data.frame(row.names = rownames(cell.emb), check.rows = F, check.names = F)
+  if(!is.null(cell.names)){
+    if(length(cell.names) != nrow(cell.emb) || any(duplicated(cell.names))){
+      warning("\'cell.names\' must be a character vector with ", nrow(cell.emb), " unique values!")
+      cell.names <- NULL
+    }
+  }
+
+  if(!is.null(meta.data)){
+    if(nrow(meta.data) != nrow(cell.emb)){
+      warning("The number of rows in \'meta.data\' does not match the cell embedding matrix!")
+      meta.data <- NULL
+    }
+  }
+
+  if(is.null(cell.names)){
+    if(is.null(meta.data)){
+      meta.data <- data.frame(row.names = rownames(cell.emb), check.rows = F, check.names = F)
+    } else rownames(cell.emb) <- rownames(meta.data)
   } else {
-    if(!is.data.frame(meta.data)) meta.data <- as.data.frame(meta.data, check.names = F)
-    rownames(meta.data) <- rownames(cell.emb)
-    if(nrow(meta.data) != nrow(cell.emb))
-      stop("The number of rows in \'meta.data\' does not match the cell embedding matrix!")
+    if(is.null(meta.data)){
+      meta.data <- data.frame(row.names = cell.names, check.rows = F, check.names = F)
+    } else rownames(meta.data) <- cell.names
+    rownames(cell.emb) <- cell.names
   }
 
   new("CellSpace",
@@ -173,7 +184,7 @@ CellSpace <- function(
 
 #' find_neighbors
 #'
-#' Built a nearest neighbor graph and shared nearest neighbor graph from the CellSpace embedding.
+#' Builds a nearest neighbor graph and shared nearest neighbor graph from the CellSpace embedding.
 #'
 #' @importFrom Seurat FindNeighbors
 #'
@@ -207,7 +218,7 @@ find_neighbors <- function(
 
 #' find_clusters
 #'
-#' Find clusters in a nearest neighbor graph built from the CellSpace embedding.
+#' Finds clusters in a nearest neighbor graph built from the CellSpace embedding.
 #'
 #' @importFrom Seurat FindClusters
 #'
@@ -232,10 +243,10 @@ find_clusters <- function(object, graph = "cells_snn", ...){
 
 #' merge_small_clusters
 #'
-#' Merge cells from small clusters with the nearest clusters.
+#' Merges cells from small clusters with the nearest clusters.
 #'
 #' @param object a \code{CellSpace} object
-#' @param clusters a vector of cluster labels or the name of a column, in the \code{meta.data} slot, containing cluster labels
+#' @param clusters a vector of cluster labels, or the name of a column in the \code{meta.data} slot containing cluster labels
 #' @param min.cells any cluster with fewer cells than \code{min.cells} will be merged with the nearest cluster
 #' @param graph a nearest neighbor graph, or the name of a nearest neighbor graph in the \code{neighbors} slot, used to find clusters
 #'
@@ -291,13 +302,13 @@ merge_small_clusters <- function(
 
 #' run_UMAP
 #'
-#' Compute a UMAP embedding from the CellSpace embedding.
+#' Computes a UMAP embedding from the CellSpace embedding.
 #'
 #' @importFrom Seurat RunUMAP
 #'
 #' @param object a \code{CellSpace} object
 #' @param emb the embedding matrix used to compute the UMAP embedding
-#' @param graph name of the nearest neighbor graph in the \code{neighbors} slot used to compute the UMAP embedding, used only if \code{emb} is NULL
+#' @param graph name of the nearest neighbor graph in the \code{neighbors} slot used to compute the UMAP embedding
 #' @param name name of the lower-dimensional embedding that will be added to the \code{reductions} slot
 #' @param ... arguments passed to \code{Seurat::RunUMAP}
 #'
@@ -332,10 +343,12 @@ run_UMAP <- function(
 
 #' cosine_similarity
 #'
-#' Cosine similarity in the embedding space.
+#' Computes cosine similarity in the embedding space.
 #'
 #' @param x an embedding matrix
-#' @param y NULL, in which case \code{y=x}, or an embedding matrix with compatible dimensions to \code{x}
+#' @param y an embedding matrix with compatible dimensions to \code{x}, or \code{NULL}, in which case \code{y=x}
+#'
+#' @return a matrix containing the cosine similarity between rows of \code{x} and \code{y}
 #'
 #' @name cosine_similarity
 #' @rdname cosine_similarity
@@ -357,11 +370,13 @@ cosine_similarity <- function(x, y = NULL){
 
 #' embedding_distance
 #'
-#' Distance in the embedding space based on cosine similarity.
+#' Computes distance in the embedding space based on cosine similarity.
 #'
 #' @param x an embedding matrix
-#' @param y NULL, in which case \code{y=x}, or an embedding matrix with compatible dimensions to \code{x}
+#' @param y an embedding matrix with compatible dimensions to \code{x}, or \code{NULL}, in which case \code{y=x}
 #' @param distance the distance metric, either 'cosine' or 'angular', to compute from the cosine similarity
+#'
+#' @return a matrix containing the distance between rows of \code{x} and \code{y}, computed from their cosine similarity
 #'
 #' @name embedding_distance
 #' @rdname embedding_distance
@@ -381,12 +396,14 @@ embedding_distance <- function(x, y = NULL, distance = c("cosine", "angular")){
 
 #' DNA_sequence_embedding
 #'
-#' Map a DNA sequence to the embedding space.
+#' Maps a DNA sequence to the embedding space.
 #'
 #' @importFrom Biostrings reverseComplement DNAStringSet
 #'
 #' @param object a \code{CellSpace} object
 #' @param seq a DNA sequence
+#'
+#' @return a numerical vector containing the CellSpace embedding of \code{seq}
 #'
 #' @name DNA_sequence_embedding
 #' @rdname DNA_sequence_embedding
@@ -407,6 +424,10 @@ DNA_sequence_embedding <- function(object, seq){
     yes = kmers,
     no = toupper(as.character(reverseComplement(DNAStringSet(kmers))))
   )
+  if(!all(kmers %in% rownames(object@kmer.emb))){
+    warning("\'", seq, "\' is not a valid DNA sequence!")
+    return(rep(NA, object@dim))
+  }
 
   kn <- length(kmers)
   if(kn == 1) return(object@kmer.emb[kmers, ])
@@ -415,12 +436,14 @@ DNA_sequence_embedding <- function(object, seq){
 
 #' motif_embedding
 #'
-#' Map a motif to the embedding space.
+#' Maps a motif to the embedding space.
 #'
 #' @importFrom Biostrings as.matrix
 #'
 #' @param object a \code{CellSpace} object
 #' @param PWM \code{PFMatrix} or \code{PWMatrix}
+#'
+#' @return a numerical vector containing the CellSpace embedding of the consensus sequence for \code{PWM}
 #'
 #' @name motif_embedding
 #' @rdname motif_embedding
@@ -434,7 +457,7 @@ motif_embedding <- function(object, PWM){
 
 #' add_motif_db
 #'
-#' Compute the CellSpace embedding and activity scores of transcription factor motifs.
+#' Computes the CellSpace embedding and activity scores of transcription factor motifs.
 #'
 #' @param object a \code{CellSpace} object
 #' @param motif.db \code{PFMatrixList} or \code{PWMatrixList}
