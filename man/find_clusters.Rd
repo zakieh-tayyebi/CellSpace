@@ -9,7 +9,7 @@ find_clusters(object, graph = "cells_snn", ...)
 \arguments{
 \item{object}{a \code{CellSpace} object}
 
-\item{graph}{name of the nearest neighbor graph in the \code{neighbors} slot used to find clusters}
+\item{graph}{name of the shared nearest neighbor graph in the \code{neighbors} slot used to find clusters}
 
 \item{...}{arguments passed to \code{Seurat::FindClusters}}
 }
@@ -17,5 +17,5 @@ find_clusters(object, graph = "cells_snn", ...)
 a \code{CellSpace} object with the cell clusters added to the \code{meta.data} slot
 }
 \description{
-Finds clusters in a nearest neighbor graph built from the CellSpace embedding.
+Finds clusters in a shared nearest neighbor graph built from the CellSpace embedding.
 }

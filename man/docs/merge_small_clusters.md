@@ -18,12 +18,12 @@ merge_small_clusters(
 
 ## Arguments
 
-| Argument    | Description                                                                                                      |
+| Argument    | Description                                                                                            |
 |---------------------------------|---------------------------------------|
-| `object`    | a `CellSpace` object                                                                                             |
-| `clusters`  | a vector of cluster labels, or the name of a column in the `meta.data` slot containing cluster labels            |
-| `min.cells` | any cluster with fewer cells than `min.cells` will be merged with the nearest cluster                            |
-| `graph`     | a nearest neighbor graph, or the name of a nearest neighbor graph in the `neighbors` slot, used to find clusters |
+| `object`    | a `CellSpace` object                                                                                   |
+| `clusters`  | a vector of cluster labels, or the name of a column in the `meta.data` slot containing cluster labels  |
+| `min.cells` | any cluster with fewer cells than `min.cells` will be merged with the nearest cluster                  |
+| `graph`     | a shared nearest neighbor graph, or the name of a graph in the `neighbors` slot, used to find clusters |
 
 ## Value
 

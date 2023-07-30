@@ -218,12 +218,12 @@ find_neighbors <- function(
 
 #' find_clusters
 #'
-#' Finds clusters in a nearest neighbor graph built from the CellSpace embedding.
+#' Finds clusters from a shared nearest neighbor graph built from the CellSpace embedding.
 #'
 #' @importFrom Seurat FindClusters
 #'
 #' @param object a \code{CellSpace} object
-#' @param graph name of the nearest neighbor graph in the \code{neighbors} slot used to find clusters
+#' @param graph name of the shared nearest neighbor graph in the \code{neighbors} slot used to find clusters
 #' @param ... arguments passed to \code{Seurat::FindClusters}
 #'
 #' @return a \code{CellSpace} object with the cell clusters added to the \code{meta.data} slot
@@ -248,7 +248,7 @@ find_clusters <- function(object, graph = "cells_snn", ...){
 #' @param object a \code{CellSpace} object
 #' @param clusters a vector of cluster labels, or the name of a column in the \code{meta.data} slot containing cluster labels
 #' @param min.cells any cluster with fewer cells than \code{min.cells} will be merged with the nearest cluster
-#' @param graph a nearest neighbor graph, or the name of a nearest neighbor graph in the \code{neighbors} slot, used to find clusters
+#' @param graph a shared nearest neighbor graph, or the name of a graph in the \code{neighbors} slot, used to find clusters
 #'
 #' @return new cluster labels
 #'
@@ -263,7 +263,7 @@ merge_small_clusters <- function(
     graph = "cells_snn",
     seed = 1
 ){
-  if(length(graph) == 1 && graph %in% names(object@neighbors)){
+  if(class(graph) == "character" && graph %in% names(object@neighbors)){
     graph <- object@neighbors[[graph]]
   } else if(class(graph) != "Graph")
     stop("'graph' must be a nearest neighbor graph of class 'Graph'")

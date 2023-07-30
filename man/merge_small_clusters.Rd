@@ -19,7 +19,7 @@ merge_small_clusters(
 
 \item{min.cells}{any cluster with fewer cells than \code{min.cells} will be merged with the nearest cluster}
 
-\item{graph}{a nearest neighbor graph, or the name of a nearest neighbor graph in the \code{neighbors} slot, used to find clusters}
+\item{graph}{a shared nearest neighbor graph, or the name of a graph in the \code{neighbors} slot, used to find clusters}
 }
 \value{
 new cluster labels

@@ -208,9 +208,9 @@ plot.groups(
 ) + labs(color = "CellSpace\nCluster")
 ```
 
-![](plots/UMAP-cells.png){width="1000"}
+<img src="plots/UMAP-cells.png" width="70%"/>
 
-You can map any valid DNA sequence that is not shorter than the *k*-mers (8bp by default) to the same embedding space, using `DNA_sequence_embedding`. The embedding of a transcription motif is computed using its consensus sequence:
+You can map any valid DNA sequence that is not shorter than the *k*-mers (8bp by default) to the same embedding space, using `DNA_sequence_embedding`. The embedding of a transcription factor motif is computed using its consensus sequence:
 
 ``` r
 pwm.list <- readRDS("data/PWM-list.rds") # example CIS-BP TF motifs
@@ -233,7 +233,7 @@ colnames(md)[3] <- "Cluster"
 plot.scores(t(motif.score), cell.annot = md, pal = pal, column_split = cso$Cell_type)
 ```
 
-![](plots/motif-scores.png){width="1000"}
+<img src="plots/motif-scores.png" width="70%"/>
 
 You can automatically perform these steps using `add_motif_db`:
 
@@ -268,4 +268,4 @@ geom_label_repel(
 )
 ```
 
-![](plots/UMAP-cells_and_TFs.png){width="1000"}
+<img src="plots/UMAP-cells_and_TFs.png" width="70%"/>

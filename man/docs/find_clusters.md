@@ -2,7 +2,7 @@
 
 ## Description
 
-Finds clusters in a nearest neighbor graph built from the CellSpace embedding.
+Finds clusters in a shared nearest neighbor graph built from the CellSpace embedding.
 
 ## Usage
 
@@ -12,11 +12,11 @@ find_clusters(object, graph = "cells_snn", ...)
 
 ## Arguments
 
-| Argument | Description                                                                      |
+| Argument | Description                                                                             |
 |---------------------------------|---------------------------------------|
-| `object` | a `CellSpace` object                                                             |
-| `graph`  | name of the nearest neighbor graph in the `neighbors` slot used to find clusters |
-| `...`    | arguments passed to `Seurat::FindClusters`                                       |
+| `object` | a `CellSpace` object                                                                    |
+| `graph`  | name of the shared nearest neighbor graph in the `neighbors` slot used to find clusters |
+| `...`    | arguments passed to `Seurat::FindClusters`                                              |
 
 ## Value
 

@@ -6,4 +6,4 @@ Pre-processing the 'Small-scale human hematopoiesis dataset':
 4.  [Filtering and sorting the alignments](4-samtools.sh),
 5.  [Filtering fragments and cells with ArchR (quality-control and doublet removal)](5-ArchR.R).
 
-The result is an ArchR object containing the pre-processed scATAC-seq data ('archr.obj').
+The result is an ArchR object containing the pre-processed scATAC-seq data (named `archr.obj`).

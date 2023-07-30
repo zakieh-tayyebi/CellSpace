@@ -4,11 +4,7 @@ CellSpace is a sequence-informed embedding method for scATAC-seq that learns a m
 
 See our [pre-print](https://www.biorxiv.org/content/10.1101/2022.05.02.490310v3.full.pdf) for more details.
 
-<p align="center">
-
-<img src="CellSpace.png" width="70%"/> <br> Learning a CellSpace embedding from single-cell ATAC-seq data.
-
-</p>
+<img src="CellSpace.png" width="70%"/>
 
 ## Installation and Usage
 
