@@ -12,7 +12,7 @@ gunzip data/*.gz
 
 The most convenient way of pre-processing your scATAC-seq data from scratch to train a CellSpace embeddding is using [ArchR](https://www.archrproject.com) [[Granja *et al.*, 2021](https://doi.org/10.1038/s41588-021-00790-6)] and exporting its top variable tiles (500bp genomic bins); so you will not need to deal with various peak-calling strategies, their biases, and manually filtering the peak atlas.
 
-The scripts used to pre-process the 'Small-scale human hematopoiesis dataset' from scratch, as described in [our manuscript](https://www.biorxiv.org/content/10.1101/2022.05.02.490310v3.full.pdf), are available [here](variable-tiles/README.md). Once you have an ArchR object containing the pre-processed scATAC-seq data (named `archr.obj` here), you can perform iterative LSI and prepare the input files to train a CellSpace embedding.
+The scripts used to pre-process the 'Small-scale human hematopoiesis dataset' from scratch, as described in [our manuscript](https://www.biorxiv.org/content/10.1101/2022.05.02.490310v4.full.pdf), are available [here](variable-tiles/README.md). Once you have an ArchR object containing the pre-processed scATAC-seq data (named `archr.obj` here), you can perform iterative LSI and prepare the input files to train a CellSpace embedding.
 
 Load required libraries:
 
@@ -62,7 +62,7 @@ We also suggest removing promoter-proximal peaks, since it's been demonstrated t
 
 Additionally, using top variable peaks significantly reduces training time, while preserving or potentially improving the quality of the embedding. We have prepared [an **R** script](variable-peaks/IterativeLSI.R) based on [ArchR's iterative LSI method](https://www.archrproject.com/bookdown/iterative-latent-semantic-indexing-lsi.html) to identify top variable peaks, without the need for an ArchR object and its ArrowFiles. Please refer to [ArchR::addIterativeLSI](https://www.archrproject.com/reference/addIterativeLSI.html) for a detailed description of parameters.
 
-The script used to filter the peak atlas of the 'Small-scale human hematopoiesis dataset', as described in [our manuscript](https://www.biorxiv.org/content/10.1101/2022.05.02.490310v3.full.pdf), is available [here](variable-peaks/filter-peaks.R). Once you have a peak-by-cell sparse count matrix of class **dgCMatrix** (named `counts` here) and its corresponding peak set of class **GRanges** (named `peaks.gr` here), you can perform iterative LSI and prepare the input files to train a CellSpace embedding.
+The script used to filter the peak atlas of the 'Small-scale human hematopoiesis dataset', as described in [our manuscript](https://www.biorxiv.org/content/10.1101/2022.05.02.490310v4.full.pdf), is available [here](variable-peaks/filter-peaks.R). Once you have a peak-by-cell sparse count matrix of class **dgCMatrix** (named `counts` here) and its corresponding peak set of class **GRanges** (named `peaks.gr` here), you can perform iterative LSI and prepare the input files to train a CellSpace embedding.
 
 Load required libraries and functions:
 
