@@ -2,7 +2,7 @@
 
 CellSpace is a sequence-informed embedding method for scATAC-seq that learns a mapping of DNA *k*-mers and cells to the same space.
 
-See our [pre-print](https://www.biorxiv.org/content/10.1101/2022.05.02.490310v3.full.pdf) for more details.
+See our [pre-print](https://www.biorxiv.org/content/10.1101/2022.05.02.490310v4.full.pdf) for more details.
 
 <img src="CellSpace.png" width="70%"/>
 
