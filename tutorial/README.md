@@ -2,7 +2,7 @@
 
 Learning a CellSpace embedding requires a cell-by-event matrix, where events are either an atlas of accessible peaks or genomic tiles, as well as the genomic sequences of the events.
 
-If you want to follow the tutorial using our example dataset, 'Small-scale human hematopoiesis dataset' [[Buenrostro et al., 2018](https://doi.org/10.1016/j.cell.2018.03.074)], you can proceed to the next section and use the files in [data/](data/) after decompressing them:
+If you want to follow the tutorial using our example dataset, 'Small-scale human hematopoiesis dataset' [[Buenrostro *et al.*, 2018](https://doi.org/10.1016/j.cell.2018.03.074)], you can proceed to the next section and use the files in [data/](data/) after decompressing them:
 
 ``` bash
 gunzip data/*.gz
