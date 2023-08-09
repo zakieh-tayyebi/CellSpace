@@ -53,15 +53,14 @@ For details about the **R** functions, please refer to the [API](R/README.md).
 
 Please cite the [arXiv paper](https://doi.org/10.1101/2022.05.02.490310) if you use CellSpace:
 
-```         
+``` bibtex
 @article {Tayyebi2022.05.02.490310,
-    author = {Tayyebi, Zakieh and Pine, Allison R. and Leslie, Christina S.},
+    author = {Zakieh Tayyebi and Allison R. Pine and Christina S. Leslie},
     title = {Scalable sequence-informed embedding of single-cell ATAC-seq data with CellSpace},
-    elocation-id = {2022.05.02.490310},
-    year = {2022},
+    year = {2023},
     doi = {10.1101/2022.05.02.490310},
-    publisher = {Cold Spring Harbor Laboratory},
-    URL = {https://doi.org/10.1101/2022.05.02.490310},
+    URL = {https://www.biorxiv.org/content/early/2023/08/08/2022.05.02.490310},
+    eprint = {https://www.biorxiv.org/content/early/2023/08/08/2022.05.02.490310.full.pdf},
     journal = {bioRxiv}
 }
 ```
