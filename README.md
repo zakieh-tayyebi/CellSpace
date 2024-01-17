@@ -45,7 +45,7 @@ devtools::install_github("https://github.com/zakieh-tayyebi/CellSpace.git")
 library(CellSpace)
 ```
 
-For details about the **R** functions, please refer to the [API](R/README.md).
+Installation should take only a few minutes. For details about the **R** functions, please refer to the [API](R/README.md).
 
 3.  A tutorial on CellSpace usage can be found [here](tutorial/README.md).
 
