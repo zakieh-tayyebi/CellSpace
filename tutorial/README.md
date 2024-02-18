@@ -36,7 +36,7 @@ Extract the accessibility matrix for top variable tiles:
 ``` r
 tile.mtx <- assays(getMatrixFromProject(archr.obj, useMatrix = "TileMatrix", binarize = T))$TileMatrix
 var.tiles <- archr.obj@reducedDims$IterativeLSI$LSIFeatures[, -3]
-var.tile.mtx <- tile.mtx[match(var.tiles, tile.mtx@elementMetadata), ]
+var.tile.mtx <- tile.mtx[match(var.tiles, tile.mtx@elementMetadata), match(archr.obj$cellNames, colnames(tile.mtx))]
 ```
 
 Prepare input files for CellSpace:
