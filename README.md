@@ -2,7 +2,7 @@
 
 CellSpace is a sequence-informed embedding method for scATAC-seq that learns a mapping of DNA *k*-mers and cells to the same space.
 
-See our [pre-print](https://www.biorxiv.org/content/10.1101/2022.05.02.490310v4.full.pdf) for more details.
+See our [publication](https://doi.org/10.1038/s41592-024-02274-x) for more details.
 
 <img src="CellSpace.png" width="70%"/>
 
@@ -51,10 +51,10 @@ Installation should take only a few minutes. For details about the **R** functio
 
 ## Citation
 
-Please cite the [arXiv paper](https://doi.org/10.1101/2022.05.02.490310) if you use CellSpace:
+Please cite our [Nature Methods paper](https://doi.org/10.1038/s41592-024-02274-x) if you use CellSpace:
 
 ```         
-Tayyebi, Z., Pine, A. R., & Leslie, C. S. (2023). Scalable sequence-informed embedding of single-cell ATAC-seq data with CellSpace. BioRxiv. https://doi.org/10.1101/2022.05.02.490310
+Tayyebi, Z., Pine, A.R. & Leslie, C.S. Scalable and unbiased sequence-informed embedding of single-cell ATAC-seq data with CellSpace. Nature Methods 21, 1014–1022 (2024). https://doi.org/10.1038/s41592-024-02274-x
 ```
 
 ## Contact
